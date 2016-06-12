@@ -1,0 +1,3 @@
+# Loader
+
+Load data from Kafka to Hadoop HDFS.
