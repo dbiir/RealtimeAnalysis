@@ -1,8 +1,7 @@
 package cn.edu.ruc.realtime.client;
 
 import cn.edu.ruc.realtime.model.Message;
-import org.apache.kafka.common.serialization.IntegerDeserializer;
-import org.junit.Test;
+import cn.edu.ruc.realtime.utils.ConfigFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,15 +11,23 @@ import java.util.List;
  */
 public class LoaderClientTest {
 
-    @Test
-    public void vTest() {
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.out.println("Usage: java -jar loaderClient propertiesFilePath");
+            System.exit(1);
+        }
+
+        System.out.println(args[0]);
+
+        ConfigFactory configFactory = ConfigFactory.getInstance(args[0]);
+
         String topic = "test";
         String schema = "test";
 
         LoaderClient client = new LoaderClient(topic, schema);
 
         for (int i = 0; i < 50; i++) {
-            Message<String, String> message = new Message<>(String.valueOf(i), "test" + i);
+            Message<String, String> message = new Message<>(String.valueOf(i), "message" + i);
             client.sendMessage(message);
         }
 
@@ -32,5 +39,7 @@ public class LoaderClientTest {
         client.sendMessages(messages);
 
         client.shutdown();
+
     }
 }
+

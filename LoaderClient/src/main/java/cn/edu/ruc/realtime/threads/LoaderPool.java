@@ -1,7 +1,6 @@
 package cn.edu.ruc.realtime.threads;
 
 import cn.edu.ruc.realtime.model.Message;
-import cn.edu.ruc.realtime.utils.ConfigFactory;
 
 import java.util.concurrent.*;
 

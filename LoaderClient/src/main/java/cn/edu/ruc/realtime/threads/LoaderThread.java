@@ -3,6 +3,8 @@ package cn.edu.ruc.realtime.threads;
 import cn.edu.ruc.realtime.model.Message;
 import cn.edu.ruc.realtime.utils.ConfigFactory;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
@@ -10,11 +12,11 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Created by Jelly on 6/12/16.
  */
-public class LoaderThread<S, T> implements Runnable {
+public class LoaderThread<K, V> implements Runnable {
     private String topic;
     private String threadName;
     private ConfigFactory config = ConfigFactory.getInstance();
-    private KafkaProducer<T, S> producer;
+    private static Producer<String, String> producer;
     private Properties props;
     private BlockingQueue<Message> queue;
 
@@ -34,12 +36,12 @@ public class LoaderThread<S, T> implements Runnable {
         props.put("value.serializer", config.getProps("value.serializer"));
         // partition class
         props.put("partitioner.class", "cn.edu.ruc.realtime.partition.LoaderPartitionKafka");
-        producer = new KafkaProducer<T, S>(props);
+        producer = new KafkaProducer(props);
     }
 
-    public void sendMessage(Message message) {
-//        producer.send(new ProducerRecord<T, S>(topic, 1, (T) message.getKey(), (S) message.getValue()));
-        System.out.println(threadName + ">\t" + message.toString());
+    public void sendMessage(Message<String, String> message) {
+        System.out.println(getThreadName() + ">\t" + message.toString());
+        producer.send(new ProducerRecord<String, String>(topic, message.getKey(), message.getValue()));
     }
 
     @Override

@@ -23,6 +23,10 @@ public class Message<K, V> {
         return key;
     }
 
+    public String getStringKey() {
+        return String.valueOf(key);
+    }
+
     public V getValue() {
         return value;
     }
