@@ -1,0 +1,10 @@
+log.dir=./
+logs=system.log,user.log
+acks=1
+retries=0
+batch.size=1024
+buffer.memory=33554432
+bootstrap.servers=192.168.7.16:9092,192.168.7.3:9093,192.168.7.4:9094
+linger.ms=1
+key.serializer=org.apache.kafka.common.serialization.StringSerializer
+value.serializer=org.apache.kafka.common.serialization.StringSerializer
