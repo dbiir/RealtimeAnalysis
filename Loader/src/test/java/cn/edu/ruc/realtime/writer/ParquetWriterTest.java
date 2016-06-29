@@ -1,6 +1,5 @@
-package cn.edu.ruc.realtime;
+package cn.edu.ruc.realtime.writer;
 
-import cn.edu.ruc.realtime.writer.ParquetWriterThread;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;

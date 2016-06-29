@@ -32,6 +32,7 @@ public class ConfigFactory {
     }
 
     private ConfigFactory() {
+        properties = new Properties();
         try {
             properties.load(new FileInputStream(new File(propPath)));
         } catch (IOException e) {
