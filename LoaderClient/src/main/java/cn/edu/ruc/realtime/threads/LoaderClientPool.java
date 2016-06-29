@@ -7,7 +7,7 @@ import java.util.concurrent.*;
 /**
  * Created by Jelly on 6/27/16.
  */
-public class LoaderPool {
+public class LoaderClientPool {
     private int threadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
 //    private ConfigFactory config = ConfigFactory.getInstance();
     private ExecutorService executor;
@@ -15,7 +15,7 @@ public class LoaderPool {
     private String topic;
 //    private int queueSize = 1000;
 
-    public LoaderPool(String topic) {
+    public LoaderClientPool(String topic) {
         executor = Executors.newFixedThreadPool(threadPoolSize);
         this.topic = topic;
         // Using ArrayBlockingQueue is more stable than LinkedBlockingQueue, while the latter one has higher throughput
@@ -28,7 +28,7 @@ public class LoaderPool {
         int tCounter = 0;
         while (tCounter < threadPoolSize) {
             String loaderName = "thread:" + topic + "-" + tCounter;
-            executor.execute(new LoaderThread<>(topic, loaderName, queue));
+            executor.execute(new LoaderClientThread<>(topic, loaderName, queue));
             tCounter++;
         }
     }

@@ -3,7 +3,7 @@ package cn.edu.ruc.realtime.partition;
 /**
  * Created by Jelly on 6/12/16.
  */
-public interface LoaderPartition {
+public interface LoaderClientPartition {
 
     /**
      * Get partition num by provided key

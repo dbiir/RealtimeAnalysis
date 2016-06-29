@@ -1,11 +1,9 @@
 package cn.edu.ruc.realtime.client;
 
 import cn.edu.ruc.realtime.model.Message;
-import cn.edu.ruc.realtime.threads.LoaderPool;
-import cn.edu.ruc.realtime.threads.LoaderThread;
+import cn.edu.ruc.realtime.threads.LoaderClientPool;
 
 import java.util.List;
-import java.util.concurrent.*;
 
 /**
  * Created by Jelly on 6/12/16.
@@ -34,7 +32,7 @@ import java.util.concurrent.*;
  * </code>
  */
 public class LoaderClient {
-    private LoaderPool loaderPool;
+    private LoaderClientPool loaderPool;
     private String topic;
     private String schema;
 
@@ -44,7 +42,7 @@ public class LoaderClient {
     public LoaderClient(String topic, String schema) {
         this.topic = topic;
         this.schema = schema;
-        loaderPool = new LoaderPool(topic);
+        loaderPool = new LoaderClientPool(topic);
         loaderPool.execute();
         //createTopic(schema);
     }

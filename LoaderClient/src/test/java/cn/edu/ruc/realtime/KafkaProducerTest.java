@@ -49,7 +49,7 @@ class KafkaProducerThread implements Runnable {
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         // partition class
-        props.put("partitioner.class", "cn.edu.ruc.realtime.partition.LoaderPartitionKafka");
+        props.put("partitioner.class", "cn.edu.ruc.realtime.partition.LoaderClientPartitionKafka");
 
         producer = new KafkaProducer(props);
     }

@@ -6,7 +6,7 @@ import java.util.Random;
  * Created by Jelly on 6/12/16.
  * Default fiber partitioner.
  */
-public class LoaderPartitionDefault implements LoaderPartition {
+public class LoaderClientPartitionDefault implements LoaderClientPartition {
     private static Random random = new Random();
 
     /**

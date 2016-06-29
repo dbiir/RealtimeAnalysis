@@ -12,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Created by Jelly on 6/12/16.
  */
-public class LoaderThread<K, V> implements Runnable {
+public class LoaderClientThread<K, V> implements Runnable {
     private String topic;
     private String threadName;
     private ConfigFactory config = ConfigFactory.getInstance();
@@ -20,7 +20,7 @@ public class LoaderThread<K, V> implements Runnable {
     private Properties props;
     private BlockingQueue<Message> queue;
 
-    public LoaderThread(String topic, String threadName, BlockingQueue<Message> queue) {
+    public LoaderClientThread(String topic, String threadName, BlockingQueue<Message> queue) {
         this.topic = topic;
         this.threadName = threadName;
         this.queue = queue;
@@ -35,7 +35,7 @@ public class LoaderThread<K, V> implements Runnable {
         props.put("key.serializer", config.getProps("key.serializer"));
         props.put("value.serializer", config.getProps("value.serializer"));
         // partition class
-        props.put("partitioner.class", "cn.edu.ruc.realtime.partition.LoaderPartitionKafka");
+        props.put("partitioner.class", config.getProps("partitioner.class"));
         producer = new KafkaProducer(props);
     }
 

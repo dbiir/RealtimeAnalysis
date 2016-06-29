@@ -9,10 +9,10 @@ import java.util.Map;
  * Created by Jelly on 6/12/16.
  * Kafka partitioner
  */
-public class LoaderPartitionKafka implements Partitioner {
+public class LoaderClientPartitionKafka implements Partitioner {
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
         int partitionNum = cluster.partitionsForTopic(topic).size();
-        return LoaderPartitionDefault.getPartition((String) key, partitionNum);
+        return LoaderClientPartitionDefault.getPartition((String) key, partitionNum);
     }
 
     public void close() {
