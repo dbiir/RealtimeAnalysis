@@ -1,1 +1,3 @@
 queue.size=5
+queue.capacity=10
+queue.factor=0.1

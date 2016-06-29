@@ -1,5 +1,7 @@
 package cn.edu.ruc.realtime.threads;
 
+import cn.edu.ruc.realtime.writer.WriterThread;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -15,7 +17,7 @@ public class LoaderManager {
     private String topic;
     private ExecutorService executor;
     private final HashMap<String, LoaderThread> loaderMap = new HashMap<>();
-    private final BlockingQueue queue = new ArrayBlockingQueue(100);
+    private final BlockingQueue queue = new ArrayBlockingQueue(10);
 
     public LoaderManager(String topic, int partitionNum) {
         this.topic = topic;
@@ -31,6 +33,8 @@ public class LoaderManager {
             executor.execute(loader);
             tCounter++;
         }
+        WriterThread writer = new WriterThread(queue);
+        writer.run();
     }
 
     public void shutdownAll() {

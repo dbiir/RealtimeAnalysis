@@ -41,17 +41,19 @@ public class LoaderThread implements Runnable {
         consumer = new KafkaConsumer(props);
         TopicPartition topicPartition = new TopicPartition(topic, partition);
         assginPartition(topicPartition);
+        // TODO seek to the beginning, just for test, should consult the meta server.
+        consumer.seekToBeginning(topicPartition);
     }
 
     @Override
     public void run() {
         try {
             while (!closed.get()) {
-                ConsumerRecords records = consumer.poll(10000);
-                Iterator recordIterator = records.iterator();
-                while (recordIterator.hasNext()) {
+                ConsumerRecords<String, String> records = consumer.poll(10000);
+                for (ConsumerRecord<String, String> record: records.records(new TopicPartition(this.topic, this.partition))) {
+                    System.out.println("Loader> " + record.value());
                     try {
-                        queue.put(recordIterator.next());
+                        queue.put(record.value());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
