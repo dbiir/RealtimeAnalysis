@@ -1,7 +1,5 @@
 package cn.edu.ruc.realtime.threads;
 
-import cn.edu.ruc.realtime.writer.WriterThread;
-
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;

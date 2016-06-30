@@ -1,4 +1,4 @@
-package cn.edu.ruc.realtime.writer;
+package cn.edu.ruc.realtime.threads;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -65,11 +65,5 @@ public class ParquetWriterThread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//
-//        if (queue.remainingCapacity() < 10) {
-//            queue.drainTo(list);
-//            for (ConsumerRecord record: list) {
-//            }
-//        }
     }
 }
