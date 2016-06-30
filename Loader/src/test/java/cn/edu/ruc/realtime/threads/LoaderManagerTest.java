@@ -6,7 +6,7 @@ package cn.edu.ruc.realtime.threads;
 public class LoaderManagerTest {
 
     public static void main(String[] args) {
-        LoaderManager manager = new LoaderManager("test", 1);
+        LoaderManager manager = new LoaderManager("test10", 10);
         manager.execute();
     }
 }

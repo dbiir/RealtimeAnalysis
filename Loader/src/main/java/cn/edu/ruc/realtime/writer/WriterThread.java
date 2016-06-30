@@ -1,10 +1,5 @@
 package cn.edu.ruc.realtime.writer;
 
-import cn.edu.ruc.realtime.utils.ConfigFactory;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.utils.SystemTime;
-import org.apache.log4j.net.SyslogAppender;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,9 +7,11 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by Jelly on 6/29/16.
+ * Writer Thread. Write data to HDFS.
  */
 public class WriterThread implements Runnable {
 
+    private String threadName;
 //    private ConfigFactory config = ConfigFactory.getInstance();
     private BlockingQueue queue;
 //    private int capacity=Integer.parseInt(config.getProps("queue.capacity"));
@@ -23,7 +20,8 @@ public class WriterThread implements Runnable {
 //    private double exhaustFactor = Double.parseDouble(config.getProps("queue.factor"));
     private Collection collection = new LinkedList();
 
-    public WriterThread(BlockingQueue queue) {
+    public WriterThread(String threadName, BlockingQueue queue) {
+        this.threadName = threadName;
         this.queue = queue;
     }
 
@@ -38,7 +36,7 @@ public class WriterThread implements Runnable {
                 queue.drainTo(collection, capacity);
                 Iterator iterator = collection.iterator();
                 while (iterator.hasNext()) {
-                    System.out.println("Writer> " + iterator.next().toString());
+                    System.out.println(this.threadName + "> " + iterator.next().toString());
                 }
             }
         }

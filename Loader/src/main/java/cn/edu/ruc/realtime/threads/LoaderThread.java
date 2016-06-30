@@ -7,13 +7,13 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Jelly on 6/29/16.
+ * Loader Thread. Pulling data from Kafka.
  */
 public class LoaderThread implements Runnable {
 
@@ -22,7 +22,7 @@ public class LoaderThread implements Runnable {
     private BlockingQueue queue;
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final AtomicBoolean paused = new AtomicBoolean(false);
-    private static KafkaConsumer consumer;
+    private final KafkaConsumer consumer;
 
     public LoaderThread(String topic, int partition, BlockingQueue queue) {
         this.topic = topic;

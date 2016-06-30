@@ -3,7 +3,6 @@ package cn.edu.ruc.realtime.threads;
 import cn.edu.ruc.realtime.writer.WriterThread;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -11,6 +10,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Created by Jelly on 6/29/16.
+ * Manager Process. Pulling from Kafka and write to HDFS.
  */
 public class LoaderManager {
     private int partitionNum;
@@ -33,7 +33,8 @@ public class LoaderManager {
             executor.execute(loader);
             tCounter++;
         }
-        WriterThread writer = new WriterThread(queue);
+        // TODO Multi writer thread
+        WriterThread writer = new WriterThread("Writer", queue);
         writer.run();
     }
 
