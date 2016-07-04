@@ -49,7 +49,7 @@ public class LoaderThread implements Runnable {
     public void run() {
         try {
             while (!closed.get()) {
-                ConsumerRecords<String, String> records = consumer.poll(10000);
+                ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
                 for (ConsumerRecord<String, String> record: records.records(new TopicPartition(this.topic, this.partition))) {
                     System.out.println("Loader> " + record.value());
                     try {

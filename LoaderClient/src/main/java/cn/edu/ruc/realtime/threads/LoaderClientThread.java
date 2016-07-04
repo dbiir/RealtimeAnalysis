@@ -2,6 +2,8 @@ package cn.edu.ruc.realtime.threads;
 
 import cn.edu.ruc.realtime.model.Message;
 import cn.edu.ruc.realtime.utils.ConfigFactory;
+import cn.edu.ruc.realtime.utils.Log;
+import cn.edu.ruc.realtime.utils.LogFactory;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -11,14 +13,16 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by Jelly on 6/12/16.
+ * Thread puts message into Kafka
  */
 public class LoaderClientThread<K, V> implements Runnable {
     private String topic;
     private String threadName;
     private ConfigFactory config = ConfigFactory.getInstance();
-    private static Producer<String, String> producer;
+    private Producer<K, V> producer;
     private Properties props;
     private BlockingQueue<Message> queue;
+    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
 
     public LoaderClientThread(String topic, String threadName, BlockingQueue<Message> queue) {
         this.topic = topic;
@@ -26,22 +30,22 @@ public class LoaderClientThread<K, V> implements Runnable {
         this.queue = queue;
 
         props = new Properties();
-        props.put("acks", config.getProps("acks"));
-        props.put("retries", Integer.parseInt(config.getProps("retries")));
-        props.put("batch.size", Integer.parseInt(config.getProps("batch.size")));
-        props.put("linger.ms", Integer.parseInt(config.getProps("linger.ms")));
-        props.put("buffer.memory", Long.parseLong(config.getProps("buffer.memory")));
-        props.put("bootstrap.servers", config.getProps("bootstrap.servers"));
-        props.put("key.serializer", config.getProps("key.serializer"));
-        props.put("value.serializer", config.getProps("value.serializer"));
-        // partition class
-        props.put("partitioner.class", config.getProps("partitioner.class"));
+        props.put("acks", config.getAcks());
+        props.put("retries", config.getRetries());
+        props.put("batch.size", config.getBatchSize());
+        props.put("linger.ms", config.getLingerMs());
+        props.put("buffer.memory", config.getBufferMemory());
+        props.put("bootstrap.servers", config.getBootstrapServers());
+        props.put("key.serializer", config.getKeySerializer());
+        props.put("value.serializer", config.getValueSerializer());
+        // partitioner class
+        props.put("partitioner.class", config.getPartitioner());
+
         producer = new KafkaProducer(props);
     }
 
-    public void sendMessage(Message<String, String> message) {
-        System.out.println(getThreadName() + ">\t" + message.toString());
-        producer.send(new ProducerRecord<String, String>(topic, message.getKey(), message.getValue()));
+    public void sendMessage(Message<K, V> message) {
+        producer.send(new ProducerRecord(topic, message.getKey(), message.getValue()));
     }
 
     @Override
@@ -51,7 +55,7 @@ public class LoaderClientThread<K, V> implements Runnable {
                 sendMessage(queue.take());
             }
         } catch (InterruptedException ite) {
-            ite.printStackTrace();
+            systemLogger.exception(ite);
         }
     }
 

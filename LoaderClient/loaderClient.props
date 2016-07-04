@@ -1,5 +1,8 @@
-log.dir=./
+# Log
+log.dir=/Users/Jelly/Developer/RealTimeAnalysis/
 logs=system.log,user.log
+
+# Zookeeper
 acks=1
 retries=0
 batch.size=1024
@@ -9,4 +12,7 @@ linger.ms=1
 key.serializer=org.apache.kafka.common.serialization.StringSerializer
 value.serializer=org.apache.kafka.common.serialization.StringSerializer
 partitioner.class=cn.edu.ruc.realtime.partition.LoaderClientPartitionKafka
-threads.num=8
+
+# Loader
+thread.pool.size=8
+thread.queue.size=1000

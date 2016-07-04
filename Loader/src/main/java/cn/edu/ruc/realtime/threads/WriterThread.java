@@ -1,6 +1,6 @@
 package cn.edu.ruc.realtime.threads;
 
-import cn.edu.ruc.realtime.writer.ParquetWriter;
+import cn.edu.ruc.realtime.writer.FileWriter;
 import cn.edu.ruc.realtime.writer.Writer;
 
 import java.util.LinkedList;
@@ -19,7 +19,7 @@ public class WriterThread<T> implements Runnable {
     private String threadName;
     private BlockingQueue<T> queue;
     private Queue<T> threadQueue = new LinkedList();
-    private Writer parquetWriter = new ParquetWriter();
+    private Writer writer = new FileWriter("/Users/Jelly/Developer/RealTimeAnalysis/lineorders_3_result");
 
     public WriterThread(String threadName, BlockingQueue queue) {
         this.threadName = threadName;
@@ -33,7 +33,7 @@ public class WriterThread<T> implements Runnable {
             try {
                 if (isReadyToWrite()) {
                     System.out.println(getThreadName() + ": Ready to write");
-                    parquetWriter.write(threadQueue);
+                    writer.write(threadQueue);
                 }
                 T message = queue.take();
                 threadQueue.add(message);

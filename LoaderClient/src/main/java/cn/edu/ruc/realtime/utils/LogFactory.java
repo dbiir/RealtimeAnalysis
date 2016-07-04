@@ -14,10 +14,12 @@ public class LogFactory {
     private LogFactory() {
         logHashMap = new HashMap<>();
         config = ConfigFactory.getInstance();
-        String[] logProps = config.getProps("logs").split(",");
+        String[] logProps = config.getLogs();
         for (String prop: logProps) {
             logHashMap.put(prop.trim(), new Log(prop.trim()));
         }
+        // default logger(must have) system.log
+        logHashMap.put("system.log", new Log("system.log"));
     }
 
     public static LogFactory getInstance() {
@@ -28,12 +30,19 @@ public class LogFactory {
     }
 
     /**
-     * Get logger by name
+     * Get customized logger by name
      * @param name logger name
      * */
     public Log getLogger(String name) {
         if (name == null)
             return null;
         return logHashMap.get(name);
+    }
+
+    /**
+     * Get system logger
+     * */
+    public Log getSystemLogger() {
+        return logHashMap.get("system.log");
     }
 }

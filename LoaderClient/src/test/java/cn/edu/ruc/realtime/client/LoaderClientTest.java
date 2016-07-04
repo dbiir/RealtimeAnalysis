@@ -21,10 +21,9 @@ public class LoaderClientTest {
 
         ConfigFactory configFactory = ConfigFactory.getInstance(args[0]);
 
-        String topic = "test";
-        String schema = "test";
+        String topic = "test07040447";
 
-        LoaderClient client = new LoaderClient(topic, schema);
+        LoaderClient client = new LoaderClient(topic);
 
         for (int i = 0; i < 50; i++) {
             Message<String, String> message = new Message<>(String.valueOf(i), "message" + i);

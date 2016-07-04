@@ -5,16 +5,11 @@ package cn.edu.ruc.realtime.model;
  * Message model.
  * A message consists of a key and a value. The key must be a String or Integer or Long
  */
-public class Message<K, V> {
+public class Message<K, V> extends Model {
     private K key;
     private V value;
 
     public Message(K key, V value) {
-//        if (key.getClass() != String.class
-//                || key.getClass() != Integer.class
-//                || key.getClass() != Long.class) {
-//            return;
-//        }
         this.key = key;
         this.value = value;
     }
