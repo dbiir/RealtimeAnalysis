@@ -1,5 +1,8 @@
 package cn.edu.ruc.realtime.writer;
 
+import cn.edu.ruc.realtime.utils.Output;
+import org.apache.jasper.tagplugins.jstl.core.Out;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Queue;
@@ -12,7 +15,7 @@ public class FileWriter implements Writer {
 
     public FileWriter(String path) {
         try {
-            writer = new BufferedWriter(new java.io.FileWriter(path));
+            writer = Output.getBufferedWriter(path, 6*1024);
         } catch (IOException e) {
             e.printStackTrace();
         }

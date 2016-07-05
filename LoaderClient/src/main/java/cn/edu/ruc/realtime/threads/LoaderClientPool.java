@@ -52,6 +52,14 @@ public class LoaderClientPool {
         systemLogger.info("Executor shutdown");
     }
 
+    public void shutdownNow() {
+        executor.shutdownNow();
+    }
+
+    public boolean isTerminated() {
+        return executor.isTerminated();
+    }
+
     public void put(Message message) {
         try {
             queue.put(message);

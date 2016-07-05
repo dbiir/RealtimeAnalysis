@@ -1,3 +1,15 @@
-queue.size=5
-queue.capacity=10
-queue.factor=0.1
+# LoaderThread
+bootstrap.servers=127.0.0.1:9092
+consumer.group.id=test
+consumer.auto.commit=false
+consumer.auto.commit.interval.ms=1000
+consumer.session.timeout=30000
+consumer.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer"
+
+# Blocking Queue
+blocking.queue.size=256*1024
+
+# WriterThread
+writer.block.size=6*1024;
+writer.full.factor=0.98
+writer.file.path=file:///home/root/result/

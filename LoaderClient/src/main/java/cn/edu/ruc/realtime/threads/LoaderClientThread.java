@@ -51,7 +51,7 @@ public class LoaderClientThread<K, V> implements Runnable {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (!Thread.interrupted()) {
                 sendMessage(queue.take());
             }
         } catch (InterruptedException ite) {

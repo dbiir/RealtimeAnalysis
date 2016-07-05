@@ -38,6 +38,5 @@ public class LoaderClientTest {
         client.sendMessages(messages);
 
         client.shutdown();
-
     }
 }

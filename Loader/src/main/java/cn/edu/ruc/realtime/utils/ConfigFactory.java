@@ -11,9 +11,10 @@ import java.util.Properties;
  */
 public class ConfigFactory {
     // props file path
-    private static String propPath = "loader.props";
+    private static String propPath = "./loader.props";
     private static Properties properties;
     private static ConfigFactory instance = null;
+    private static Log systemLogger;
 
     private ConfigFactory(String path) {
         if (path != null || path != "")
@@ -25,6 +26,7 @@ public class ConfigFactory {
             // TODO terminate
             e.printStackTrace();
         }
+        systemLogger = LogFactory.getInstance().getSystemLogger();
     }
 
     private ConfigFactory() {
@@ -60,12 +62,155 @@ public class ConfigFactory {
      * get property by key
      * @param key prop name
      * */
-    public String getProps(String key) {
+    private String getProps(String key) throws PropertyNotExistException {
         if (instance == null) {
-            return null;
+            throw new PropertyNotExistException("Property " + key + " does not exist in config file.");
         }
-        return properties.getProperty(key);
+        return properties.getProperty(key).trim();
     }
 
     // TODO implement all properties get method, handler all exceptions in place
+    public String getLogDir() {
+        try {
+            return getProps("log.dir");
+        } catch (PropertyNotExistException e) {
+            e.printStackTrace();
+        }
+        return "./loader.props";
+    }
+
+    public String[] getLogs() {
+        try {
+            return getProps("logs").split("\\s*,\\s*");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return new String[]{"system.log", "user.log"};
+    }
+
+    public int getBlockingQueueSize() {
+        try {
+            return Integer.parseInt(getProps("blocking.queue.size"));
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 1024;
+    }
+
+    public int getWriterThreadNum() {
+        try {
+            return Integer.parseInt(getProps("writer.thread.num"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 1;
+    }
+
+    /**
+     * Get kafka consumer bootstrap servers
+     * If not specified, default to "127.0.0.1:9092"
+     * */
+    public String getBootstrapServers() {
+        try {
+            return getProps("bootstrap.servers");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "127.0.0.1:9092";
+    }
+
+    public String getConsumerGroupId() {
+        try {
+            return getProps("consumer.group.id");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "test";
+    }
+
+    public String getConsumerAutoCommit() {
+        try {
+            String isAuto = getProps("consumer.auto.commit");
+            if (isAuto == "true" || isAuto == "TRUE") {
+                return "true";
+            }
+            if (isAuto == "false" || isAuto == "FALSE") {
+                return "false";
+            }
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "true";
+    }
+
+    public String getConsumerAutoCommitInterval() {
+        try {
+            return getProps("consumer.auto.commit.interval.ms");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "1000";
+    }
+
+    public String getConsumerSessionTimeout() {
+        try {
+            return getProps("consumer.session.timeout");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "30000";
+    }
+
+    public String getConsumerKeyDeserializer() {
+        try {
+            return getProps("consumer.key.deserializer");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "org.apache.kafka.common.serialization.StringDeserializer";
+    }
+
+    public String getConsumerValueDeserializer() {
+        try {
+            return getProps("consumer.value.deserializer");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "org.apache.kafka.common.serialization.StringDeserializer";
+    }
+
+    public String getWriterFilePath() {
+        try {
+            return getProps("writer.file.path");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "file:///result/";
+    }
+
+    public long getWriterBlockSize() {
+        try {
+            return Long.parseLong(getProps("writer.block.size"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 256L * 1024L;
+    }
+
+    public float getWriterFullFactor() {
+        try {
+            return Float.parseFloat(getProps("writer.full.factor"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 0.98f;
+    }
 }

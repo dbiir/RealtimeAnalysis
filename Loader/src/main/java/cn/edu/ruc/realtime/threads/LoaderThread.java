@@ -1,5 +1,8 @@
 package cn.edu.ruc.realtime.threads;
 
+import cn.edu.ruc.realtime.utils.ConfigFactory;
+import cn.edu.ruc.realtime.utils.Log;
+import cn.edu.ruc.realtime.utils.LogFactory;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -20,6 +23,8 @@ public class LoaderThread implements Runnable {
     private String topic;
     private int partition;
     private BlockingQueue queue;
+    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
+    private final ConfigFactory configFactory = ConfigFactory.getInstance();
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final AtomicBoolean paused = new AtomicBoolean(false);
     private final KafkaConsumer consumer;
@@ -30,13 +35,13 @@ public class LoaderThread implements Runnable {
         this.queue = queue;
 
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
-        props.put("group.id", "test");
-        props.put("enable.auto.commit", "true");
-        props.put("auto.commit.interval.ms", "1000");
-        props.put("session.timeout.ms", "30000");
-        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("bootstrap.servers", configFactory.getBootstrapServers());
+        props.put("group.id", configFactory.getConsumerGroupId());
+        props.put("enable.auto.commit", configFactory.getConsumerAutoCommit());
+        props.put("auto.commit.interval.ms", configFactory.getConsumerAutoCommitInterval());
+        props.put("session.timeout.ms", configFactory.getConsumerSessionTimeout());
+        props.put("key.deserializer", configFactory.getConsumerKeyDeserializer());
+        props.put("value.deserializer", configFactory.getConsumerValueDeserializer());
 
         consumer = new KafkaConsumer(props);
         TopicPartition topicPartition = new TopicPartition(topic, partition);
@@ -51,11 +56,11 @@ public class LoaderThread implements Runnable {
             while (!closed.get()) {
                 ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
                 for (ConsumerRecord<String, String> record: records.records(new TopicPartition(this.topic, this.partition))) {
-                    System.out.println("Loader> " + record.value());
+                    systemLogger.info(getName() + record.value());
                     try {
                         queue.put(record.value());
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        systemLogger.exception(e);
                     }
                 }
             }
@@ -82,18 +87,21 @@ public class LoaderThread implements Runnable {
     }
 
     public String getName() {
-        return "Consumer " + topic + "-" + partition;
+        return "Loader-" + getTopic() + "-" + getPartition();
     }
 
     public void shutdown() {
         closed.set(true);
         consumer.wakeup();
+//        this.shutdown();
+        systemLogger.info(getName() + ": shutdown");
     }
 
     public void pause() {
         if (!paused.get()) {
             paused.set(true);
             consumer.pause();
+            systemLogger.info(getName() + ": pause");
         }
     }
 
@@ -101,6 +109,11 @@ public class LoaderThread implements Runnable {
         if (paused.get()) {
             paused.set(false);
             consumer.wakeup();
+            systemLogger.info(getName() + ": wakeup");
         }
+    }
+
+    public String toString() {
+        return this.getName();
     }
 }

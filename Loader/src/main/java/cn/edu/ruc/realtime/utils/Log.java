@@ -6,7 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by Jelly on 6/29/16.
+ * Created by Jelly on 6/12/16.
+ * Logger
  */
 public class Log {
     private String name;
@@ -17,7 +18,7 @@ public class Log {
     public Log(String name) {
         this.name = name;
         try {
-            logBase = ConfigFactory.getInstance().getProps("log.dir").trim();
+            logBase = ConfigFactory.getInstance().getLogDir();
             // check logBase to fit in LINUX or UNIX file directory naming convention.
             if (!logBase.endsWith("/")) {
                 logBase += "/";
@@ -37,98 +38,89 @@ public class Log {
      * Log error message
      * @param msg error message
      * */
-    public synchronized void error(String msg) {
-        try {
-            timestamp = new SimpleDateFormat("yyyy-mm-dd:HH-mm-ss").format(new Date());
-            logWriter.write(timestamp + " [ERROR] " + msg + "\n");
-            logWriter.flush();
-        } catch (IOException ioe) {
-            // TODO error handler
-            ioe.printStackTrace();
-        }
+    public void error(String msg) {
+        logMsg(msg, "error");
     }
 
     /**
      * Log error message
      * @param err Error
      * */
-    public synchronized void error(Error err) {
-        try {
-            timestamp = new SimpleDateFormat("yyyy-mm-dd:HH-mm-ss").format(new Date());
-            String errMsg = timestamp + "[ERROR] " + err.getMessage() + "\n";
-            for (StackTraceElement element : err.getStackTrace()) {
-                errMsg += "\t[Error Stack] " + element.getClassName() + "." + element.getMethodName() +
-                        " at " + element.getFileName() + ":" + element.getLineNumber() + "\n";
-            }
-            logWriter.write(errMsg);
-            logWriter.flush();
-        } catch (IOException ioe) {
-            // TODO error handler
-            ioe.printStackTrace();
-        }
+    public void error(Error err) {
+        logThw(err);
     }
 
     /**
      * Log exception message
      * @param msg exception message
      * */
-    public synchronized void exception(String msg) {
-        try {
-            timestamp = new SimpleDateFormat("yyyy-mm-dd:HH-mm-ss").format(new Date());
-            logWriter.write(timestamp + " [EXCEPTION] " + msg + "\n");
-            logWriter.flush();
-        } catch (IOException ioe) {
-            // TODO error handler
-            ioe.printStackTrace();
-        }
+    public void exception(String msg) {
+        logMsg(msg, "exception");
     }
 
     /**
      * Log exception message
      * @param e Exception
      * */
-    public synchronized void exception(Exception e) {
-        try {
-            timestamp = new SimpleDateFormat("yyyy-mm-dd:HH-mm-ss").format(new Date());
-            String expMsg = timestamp + " [EXCEPTION] " + e.getMessage() + "\n";
-            for (StackTraceElement element : e.getStackTrace()) {
-                expMsg += "\t[EXCEPTION MSG] " + element.getClassName() + "."  + element.getMethodName()
-                        + " at " + element.getFileName() + ":" + element.getLineNumber() + "\n";
-            }
-            logWriter.write(expMsg);
-            logWriter.flush();
-        } catch (IOException ioe) {
-            // TODO err handler
-            ioe.printStackTrace();
-        }
+    public void exception(Exception e) {
+        logThw(e);
     }
 
     /**
      * Log warning message
      * @param msg warning message
      * */
-    public synchronized void warn(String msg) {
-        try {
-            timestamp = new SimpleDateFormat("yyyy-mm-dd:HH-mm-ss").format(new Date());
-            logWriter.write(timestamp + " [WARN] " + msg + "\n");
-            logWriter.flush();
-        } catch (IOException ioe) {
-            // TODO error handler
-            ioe.printStackTrace();
-        }
+    public void warn(String msg) {
+        logMsg(msg, "warn");
     }
 
     /**
      * Log info message
      * @param msg info message
      * */
-    public synchronized void info(String msg) {
+    public void info(String msg) {
+        logMsg(msg, "info");
+    }
+
+    /**
+     * Log message
+     * @param msg log message
+     * @param type log type: info, warn, exception, error
+     * @synchronized
+     * */
+    private synchronized void logMsg(String msg, String type) {
         try {
-            timestamp = new SimpleDateFormat("yyyy-mm-dd:HH-mm-ss").format(new Date());
-            logWriter.write(timestamp + " [INFO] " + msg + "\n");
+            timestamp = new SimpleDateFormat("yyyy-MM-dd:HH-mm-ss z").format(new Date());
+            logWriter.write(timestamp + "[" + type + "]" + msg + "\n");
             logWriter.flush();
         } catch (IOException ioe) {
-            // TODO error handler
+            ioe.printStackTrace();
+        }
+    }
+
+    /**
+     * Log throwable
+     * @param t throwable
+     * @synchronized
+     * */
+    private synchronized void logThw(Throwable t) {
+        String type;
+        if (t.getClass() == Exception.class) {
+            type = "EXCEPTION";
+        } else {
+            type = "ERROR";
+        }
+        try {
+            timestamp = new SimpleDateFormat("yyyy-MM-dd:HH-mm-ss z").format(new Date());
+            String expMsg = timestamp + " [" + type + "] " + t.getMessage() + "\n";
+            for (StackTraceElement element : t.getStackTrace()) {
+                expMsg += "\t[" + type + " MSG] " + element.getClassName() + "."  + element.getMethodName()
+                        + " at " + element.getFileName() + ":" + element.getLineNumber() + "\n";
+            }
+            logWriter.write(expMsg);
+            logWriter.flush();
+        } catch (IOException ioe) {
+            // TODO err handler
             ioe.printStackTrace();
         }
     }

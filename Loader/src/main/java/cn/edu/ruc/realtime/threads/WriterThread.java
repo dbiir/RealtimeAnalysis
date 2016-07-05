@@ -1,5 +1,8 @@
 package cn.edu.ruc.realtime.threads;
 
+import cn.edu.ruc.realtime.utils.ConfigFactory;
+import cn.edu.ruc.realtime.utils.Log;
+import cn.edu.ruc.realtime.utils.LogFactory;
 import cn.edu.ruc.realtime.writer.FileWriter;
 import cn.edu.ruc.realtime.writer.Writer;
 
@@ -14,12 +17,15 @@ import java.util.concurrent.BlockingQueue;
 public class WriterThread<T> implements Runnable {
 
     // TODO should read from config file
-    private final static int blockSize = 100;
-    private final static float fullFactor = 0.95f;
+    private final ConfigFactory configFactory = ConfigFactory.getInstance();
+    private final String basePath = configFactory.getWriterFilePath();
+    private final long blockSize = configFactory.getWriterBlockSize();
+    private final float fullFactor = configFactory.getWriterFullFactor();
+    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
     private String threadName;
     private BlockingQueue<T> queue;
-    private Queue<T> threadQueue = new LinkedList();
-    private Writer writer = new FileWriter("/Users/Jelly/Developer/RealTimeAnalysis/lineorders_3_result");
+    private Queue<T> writerQueue = new LinkedList();
+    private Writer writer;
 
     public WriterThread(String threadName, BlockingQueue queue) {
         this.threadName = threadName;
@@ -28,15 +34,16 @@ public class WriterThread<T> implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(getThreadName() + " started");
+        systemLogger.info(getName() + ": started");
+        writer = new FileWriter(basePath);
         while (!Thread.interrupted()) {
             try {
                 if (isReadyToWrite()) {
-                    System.out.println(getThreadName() + ": Ready to write");
-                    writer.write(threadQueue);
+                    systemLogger.info(getName() + ": Ready to write");
+                    writer.write(writerQueue);
                 }
                 T message = queue.take();
-                threadQueue.add(message);
+                writerQueue.add(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -44,13 +51,21 @@ public class WriterThread<T> implements Runnable {
     }
 
     public boolean isReadyToWrite() {
-        if (this.threadQueue.size() > (blockSize * fullFactor)) {
+        if (this.writerQueue.size() > (blockSize * fullFactor)) {
             return true;
         }
         return false;
     }
 
-    public String getThreadName() {
+    public String getName() {
         return this.threadName;
+    }
+
+    public void shutdown() {
+        this.shutdown();
+    }
+
+    public String toString() {
+        return this.getName();
     }
 }
