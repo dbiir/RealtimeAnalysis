@@ -1,5 +1,6 @@
 package cn.edu.ruc.realtime.threads;
 
+import cn.edu.ruc.realtime.model.Batch;
 import cn.edu.ruc.realtime.utils.ConfigFactory;
 
 import java.util.HashMap;
@@ -21,7 +22,7 @@ public class LoaderManager {
     private int writerThreadNum = configFactory.getWriterThreadNum();
     private final HashMap<String, LoaderThread> loaderMap = new HashMap<>();
     private final HashMap<String, WriterThread> writerMap = new HashMap<>();
-    private final BlockingQueue queue = new ArrayBlockingQueue(blockingQueueSize);
+    private final BlockingQueue<Batch> queue = new ArrayBlockingQueue(blockingQueueSize);
 
     public LoaderManager(String topic, int partitionNum) {
         this.topic = topic;

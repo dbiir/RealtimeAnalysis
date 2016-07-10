@@ -11,6 +11,6 @@ public class ConfigFactoryTest {
 
     @Test
     public void test() {
-        System.out.println(config.getProps("queue.size"));
+        System.out.println(config.getBlockingQueueSize());
     }
 }

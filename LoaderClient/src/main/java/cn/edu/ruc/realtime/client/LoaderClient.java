@@ -83,7 +83,7 @@ public class LoaderClient {
         System.out.println("Client for " + topic + " shutdown");
         systemLogger.info("Client for " + topic + " shutdown");
         while (!loaderPool.isTerminated()) {
-            System.out.println("Thread not shut down.");
+//            System.out.println("Thread not shut down.");
         }
     }
 }

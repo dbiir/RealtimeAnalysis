@@ -1,5 +1,6 @@
 package cn.edu.ruc.realtime.threads;
 
+import cn.edu.ruc.realtime.model.Batch;
 import cn.edu.ruc.realtime.utils.ConfigFactory;
 import cn.edu.ruc.realtime.utils.Log;
 import cn.edu.ruc.realtime.utils.LogFactory;
@@ -16,20 +17,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Jelly on 6/29/16.
- * Loader Thread. Pulling data from Kafka.
+ * Loader Thread.
+ * Each thread pulls data from specified partition of Kafka, and essemble data into {@link cn.edu.ruc.realtime.model.Batch} in thread, and then put Batch
+ * into shared buffer. When shared buffer is ready to write, {@link WriterThread} will write shared buffer block out.
  */
 public class LoaderThread implements Runnable {
 
     private String topic;
     private int partition;
-    private BlockingQueue queue;
-    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
+    private BlockingQueue<Batch> queue;
     private final ConfigFactory configFactory = ConfigFactory.getInstance();
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final AtomicBoolean paused = new AtomicBoolean(false);
     private final KafkaConsumer consumer;
+    private final int batchSize = configFactory.getWriterBatchSize();
+    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
 
-    public LoaderThread(String topic, int partition, BlockingQueue queue) {
+    public LoaderThread(String topic, int partition, BlockingQueue<Batch> queue) {
         this.topic = topic;
         this.partition = partition;
         this.queue = queue;
@@ -54,11 +58,17 @@ public class LoaderThread implements Runnable {
     public void run() {
         try {
             while (!closed.get()) {
+                Batch<String> batch = new Batch<>(batchSize, partition);
                 ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
                 for (ConsumerRecord<String, String> record: records.records(new TopicPartition(this.topic, this.partition))) {
                     systemLogger.info(getName() + record.value());
                     try {
-                        queue.put(record.value());
+                        if (batch.isFull()) {
+//                            queue.put(record.value());
+                            queue.put(batch);
+                            batch = new Batch<>(batchSize, partition);
+                        }
+                        batch.addMsg(record.value(), record.offset());
                     } catch (InterruptedException e) {
                         systemLogger.exception(e);
                     }

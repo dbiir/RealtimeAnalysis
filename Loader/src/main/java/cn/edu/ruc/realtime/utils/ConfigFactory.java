@@ -63,7 +63,7 @@ public class ConfigFactory {
      * @param key prop name
      * */
     private String getProps(String key) throws PropertyNotExistException {
-        if (instance == null) {
+        if (instance == null || properties.getProperty(key) == null) {
             throw new PropertyNotExistException("Property " + key + " does not exist in config file.");
         }
         return properties.getProperty(key).trim();
@@ -192,16 +192,16 @@ public class ConfigFactory {
         return "file:///result/";
     }
 
-    public long getWriterBlockSize() {
-        try {
-            return Long.parseLong(getProps("writer.block.size"));
-        } catch (PropertyNotExistException pe) {
-            systemLogger.exception(pe);
-        } catch (NumberFormatException ne) {
-            systemLogger.exception(ne);
-        }
-        return 256L * 1024L;
-    }
+//    public long getWriterBlockSize() {
+//        try {
+//            return Long.parseLong(getProps("writer.block.size"));
+//        } catch (PropertyNotExistException pe) {
+//            systemLogger.exception(pe);
+//        } catch (NumberFormatException ne) {
+//            systemLogger.exception(ne);
+//        }
+//        return 256L * 1024L;
+//    }
 
     public float getWriterFullFactor() {
         try {
@@ -212,5 +212,71 @@ public class ConfigFactory {
             systemLogger.exception(ne);
         }
         return 0.98f;
+    }
+
+    /**
+     * Batch consists of messages.
+     * Get number of messages each batch.
+     * */
+    public int getWriterBatchSize() {
+        try {
+            return Integer.parseInt(getProps("writer.batch.size"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 1000;
+    }
+
+    /**
+     * Block consists of batches.
+     * Get number of batches each block.
+     * */
+    public int getWriterBlockSize() {
+        try {
+            return Integer.parseInt(getProps("writer.block.size"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 10;
+    }
+
+    public String getDBConnectionURL() {
+        try {
+            return getProps("db.connection.url");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "jdbc:postgresql://localhost/db";
+    }
+
+    public String getDBConnectionUser() {
+        try {
+            return getProps("db.connection.user");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "postgres";
+    }
+
+    public String getDBConnectionPwd() {
+        try {
+            return getProps("db.connection.pass");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "postgres";
+    }
+
+    public String getDBConnectionDriverClass() {
+        try {
+            return getProps("db.connection.driver.class");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "org.postgresql.Driver";
     }
 }

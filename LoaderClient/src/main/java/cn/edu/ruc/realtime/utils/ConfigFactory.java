@@ -66,7 +66,7 @@ public class ConfigFactory {
      * @throws PropertyNotExistException
      * */
     private String getProps(String key) throws PropertyNotExistException {
-        if (instance == null) {
+        if (instance == null || properties.getProperty(key) == null) {
             throw new PropertyNotExistException("Property " + key + " not exists.");
         }
         return properties.getProperty(key).trim();
