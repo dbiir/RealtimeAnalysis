@@ -7,3 +7,5 @@ pom.xml
 *.jar
 *.iml
 *.log
+resources/
+result

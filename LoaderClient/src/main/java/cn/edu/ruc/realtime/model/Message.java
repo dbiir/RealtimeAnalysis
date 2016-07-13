@@ -8,6 +8,7 @@ package cn.edu.ruc.realtime.model;
 public class Message<K, V> extends Model {
     private K key;
     private V value;
+    private long timestamp;
 
     public Message(K key, V value) {
         this.key = key;
@@ -27,6 +28,14 @@ public class Message<K, V> extends Model {
     }
 
     public String toString() {
-        return String.valueOf(key) + ": " + String.valueOf(value);
+        return String.valueOf(key) + ": " + String.valueOf(value) + "|| " + String.valueOf(timestamp);
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public long getTimestamp() {
+        return this.timestamp;
     }
 }

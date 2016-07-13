@@ -1,7 +1,9 @@
 package cn.edu.ruc.realtime.client;
 
 import cn.edu.ruc.realtime.model.Message;
-import cn.edu.ruc.realtime.threads.LoaderClientPool;
+import cn.edu.ruc.realtime.threads.ConsumerThreadPool;
+import cn.edu.ruc.realtime.threads.KafkaConsumerThread;
+import cn.edu.ruc.realtime.threads.SimpleConsumerThread;
 import cn.edu.ruc.realtime.utils.Log;
 import cn.edu.ruc.realtime.utils.LogFactory;
 
@@ -34,7 +36,7 @@ import java.util.List;
  * </code>
  */
 public class LoaderClient {
-    private LoaderClientPool loaderPool;
+    private ConsumerThreadPool loaderPool;
     private String topic;
     private Log systemLogger;
 
@@ -43,15 +45,19 @@ public class LoaderClient {
      * */
     public LoaderClient(String topic) {
         this.topic = topic;
-        loaderPool = new LoaderClientPool(topic);
+        loaderPool = new ConsumerThreadPool(topic);
+        for (int i = 0; i < 1; i++) {
+            KafkaConsumerThread thread = new KafkaConsumerThread(topic, "KafkaConsumer" + i, loaderPool.getQueue());
+            loaderPool.addConsumer(thread);
+        }
         loaderPool.execute();
         systemLogger = LogFactory.getInstance().getSystemLogger();
-        //createTopic(schema);
     }
 
     /**
      * Create a topic
      * @param topic name of topic
+     * @deprecated
      * */
     private void createTopic(String topic, int partitionNum, int replication) {
         // TODO create topic

@@ -1,0 +1,55 @@
+package cn.edu.ruc.realtime.threads;
+
+import cn.edu.ruc.realtime.model.Message;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * @author Jelly
+ */
+public class SimpleConsumerThread extends ConsumerThread {
+    private String threadName;
+    private BlockingQueue<Message> blockingQueue;
+    private AtomicLong msgCounter = new AtomicLong(0L);
+    private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
+
+    public SimpleConsumerThread(String threadName, BlockingQueue<Message> blockingQueue) {
+        this.threadName = threadName;
+        this.blockingQueue = blockingQueue;
+    }
+
+    @Override
+    public String getThreadName() {
+        return this.threadName;
+    }
+
+    @Override
+    public void run() {
+        long before = System.currentTimeMillis();
+        while (!readyToStop()) {
+            if (readyToStop() && blockingQueue.isEmpty()) {
+                blockingQueue = null;
+                break;
+            } else {
+                try {
+                    blockingQueue.take();
+                    msgCounter.getAndIncrement();
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Consumed messages: " + msgCounter.get() + " Cost: " + (end - before) + " ms");
+    }
+
+    public void setReadyToStop() {
+        isReadyToStop.set(true);
+    }
+
+    public boolean readyToStop() {
+        return isReadyToStop.get();
+    }
+}

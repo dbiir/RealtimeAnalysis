@@ -8,9 +8,10 @@ import java.util.Queue;
 public class ConsoleWriter implements Writer {
 
     @Override
-    public void write(Queue queue) {
+    public boolean write(Queue queue) {
         while (queue.peek() != null) {
             System.out.println(queue.poll());
         }
+        return true;
     }
 }

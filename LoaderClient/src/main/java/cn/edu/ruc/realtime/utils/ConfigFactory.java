@@ -13,7 +13,7 @@ import java.util.Properties;
  */
 public class ConfigFactory {
     // default props file path
-    private static String propPath = "./loaderClient.props";
+    private static String propPath = "./config.props";
     private static Properties properties;
     private static ConfigFactory instance = null;
     private static Log systemLogger;
@@ -236,5 +236,173 @@ public class ConfigFactory {
             systemLogger.exception(e);
         }
         return 0;
+    }
+
+    public String getConsumerGroupId() {
+        try {
+            return getProps("consumer.group.id");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "test";
+    }
+
+    public String getConsumerAutoCommit() {
+        try {
+            String isAuto = getProps("consumer.auto.commit");
+            if (isAuto == "true" || isAuto == "TRUE") {
+                return "true";
+            }
+            if (isAuto == "false" || isAuto == "FALSE") {
+                return "false";
+            }
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "true";
+    }
+
+    public String getConsumerAutoCommitInterval() {
+        try {
+            return getProps("consumer.auto.commit.interval.ms");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "1000";
+    }
+
+    public String getConsumerSessionTimeout() {
+        try {
+            return getProps("consumer.session.timeout");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "30000";
+    }
+
+    public String getConsumerKeyDeserializer() {
+        try {
+            return getProps("consumer.key.deserializer");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "org.apache.kafka.common.serialization.StringDeserializer";
+    }
+
+    public String getConsumerValueDeserializer() {
+        try {
+            return getProps("consumer.value.deserializer");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "org.apache.kafka.common.serialization.StringDeserializer";
+    }
+
+    public String getWriterFilePath() {
+        try {
+            return getProps("writer.file.path");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "file:///result/";
+    }
+
+    public float getWriterFullFactor() {
+        try {
+            return Float.parseFloat(getProps("writer.full.factor"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 0.98f;
+    }
+
+    /**
+     * Batch consists of messages.
+     * Get number of messages each batch.
+     * */
+    public int getWriterBatchSize() {
+        try {
+            return Integer.parseInt(getProps("writer.batch.size"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 1000;
+    }
+
+    /**
+     * Block consists of batches.
+     * Get number of batches each block.
+     * */
+    public int getWriterBlockSize() {
+        try {
+            return Integer.parseInt(getProps("writer.block.size"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 10;
+    }
+
+    public String getDBConnectionURL() {
+        try {
+            return getProps("db.connection.url");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "jdbc:postgresql://localhost/db";
+    }
+
+    public String getDBConnectionUser() {
+        try {
+            return getProps("db.connection.user");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "postgres";
+    }
+
+    public String getDBConnectionPwd() {
+        try {
+            return getProps("db.connection.pass");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "postgres";
+    }
+
+    public String getDBConnectionDriverClass() {
+        try {
+            return getProps("db.connection.driver.class");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "org.postgresql.Driver";
+    }
+
+    public int getBlockingQueueSize() {
+        try {
+            return Integer.parseInt(getProps("blocking.queue.size"));
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 1024;
+    }
+
+    public int getWriterThreadNum() {
+        try {
+            return Integer.parseInt(getProps("writer.thread.num"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 1;
     }
 }

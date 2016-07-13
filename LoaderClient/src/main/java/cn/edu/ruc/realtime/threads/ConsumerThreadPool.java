@@ -5,25 +5,31 @@ import cn.edu.ruc.realtime.utils.ConfigFactory;
 import cn.edu.ruc.realtime.utils.Log;
 import cn.edu.ruc.realtime.utils.LogFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.*;
 
 /**
- * Created by Jelly on 6/27/16.
+ * @author Jelly
  */
-public class LoaderClientPool {
+public class ConsumerThreadPool {
     // default thread pool size is equal to physical thread num: 2 * (num of processors)
     private int threadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
     private ConfigFactory config = ConfigFactory.getInstance();
     private ExecutorService executor;
     // blocking array queue
     private ArrayBlockingQueue<Message> queue;
+    // kafka topic
     private String topic;
+    // consumer thread list
+    private List<ConsumerThread> consumerList;
     // default blocking array queue size
     private int queueSize = 1000;
     // default logger
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
 
-    public LoaderClientPool(String topic) {
+    public ConsumerThreadPool(String topic) {
         // if customized thread pool size is larger, set to customized one, else stick to default
         if (config.getThreadPoolSize() > threadPoolSize)
             threadPoolSize = config.getThreadPoolSize();
@@ -33,22 +39,26 @@ public class LoaderClientPool {
         executor = Executors.newFixedThreadPool(threadPoolSize);
         this.topic = topic;
         queue = new ArrayBlockingQueue(queueSize);
+        consumerList = new ArrayList<>(threadPoolSize);
     }
 
     public void execute() {
-        System.out.println("Execute threads num: " + threadPoolSize);
         systemLogger.info("Execute threads num: " + threadPoolSize);
-        int tCounter = 0;
-        while (tCounter < threadPoolSize) {
-            String loaderName = "thread:" + topic + "-" + tCounter;
-            executor.execute(new LoaderClientThread<>(topic, loaderName, queue));
-            systemLogger.info("Launch thread " + loaderName);
-            tCounter++;
+        for (ConsumerThread consumerThread: consumerList) {
+            executor.execute(consumerThread);
+            systemLogger.info("Launch thread " + consumerThread.getThreadName());
         }
     }
 
     public void shutdown() {
+        for (ConsumerThread consumerThread: consumerList) {
+//            consumerThread.interrupt();
+            consumerThread.setReadyToStop();
+        }
         executor.shutdown();
+        if (!isTerminated()) {
+            shutdownNow();
+        }
         systemLogger.info("Executor shutdown");
     }
 
@@ -66,5 +76,13 @@ public class LoaderClientPool {
         } catch (InterruptedException e) {
             systemLogger.exception(e);
         }
+    }
+
+    public void addConsumer(ConsumerThread consumer) {
+        consumerList.add(consumer);
+    }
+
+    public BlockingQueue<Message> getQueue() {
+        return this.queue;
     }
 }

@@ -75,7 +75,7 @@ public class ParquetWriter implements Writer {
     }
 
     @Override
-    public void write(Queue queue) {
+    public boolean write(Queue queue) {
         groupWriteSupport.setSchema(schema, conf);
         while (queue.peek() != null) {
             String record = (String) queue.poll();
@@ -111,7 +111,9 @@ public class ParquetWriter implements Writer {
                 );
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
         }
+        return true;
     }
 }
