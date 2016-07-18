@@ -92,7 +92,7 @@ public class SimpleLoaderThread extends LoaderThread {
     }
 
     public String getName() {
-        return "Loader-" + getTopic() + "-" + getPartition();
+        return "SimpleLoaderThread-" + getTopic() + "-" + getPartition();
     }
 
     @Override

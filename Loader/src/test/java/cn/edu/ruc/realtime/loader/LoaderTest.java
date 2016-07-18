@@ -12,7 +12,7 @@ public class LoaderTest {
     public static void main(String[] args) {
         ConfigFactory configFactory = ConfigFactory.getInstance(args[0]);
 
-        Loader loader = new Loader("test01", 1);
+        Loader loader = new Loader("test02", 1);
         loader.load();
     }
 }

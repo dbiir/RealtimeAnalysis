@@ -1,7 +1,8 @@
 package cn.edu.ruc.realtime.threads;
 
 import cn.edu.ruc.realtime.model.Batch;
-import cn.edu.ruc.realtime.model.Message;
+import cn.edu.ruc.realtime.model.Block;
+import cn.edu.ruc.realtime.model.Meta;
 import cn.edu.ruc.realtime.utils.*;
 import cn.edu.ruc.realtime.writer.FileWriter;
 import cn.edu.ruc.realtime.writer.Writer;
@@ -16,14 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SimpleWriterThread extends WriterThread {
 
-    private final ConfigFactory configFactory = ConfigFactory.getInstance();
-    private final String basePath = configFactory.getWriterFilePath();
-    private final long blockSize = configFactory.getWriterBlockSize();
-    private final float fullFactor = configFactory.getWriterFullFactor();
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
     private String threadName;
     private BlockingQueue<Batch> queue;
-    private Queue<Batch> writerQueue = new LinkedList();
+    private Block block = new Block();
     private Writer writer;
     private HashMap<Integer, Long> offsetMap = new HashMap<>();
 //    private DBConnection dbConnection = new PostgresConnection();
@@ -40,31 +37,44 @@ public class SimpleWriterThread extends WriterThread {
     public void run() {
         //TODO Add time limit
         systemLogger.info(getName() + ": started");
-        writer = new FileWriter(basePath);
-        while (!Thread.interrupted()) {
+        writer = new FileWriter();
+        while (true) {
+            if (readyToStop() && queue.isEmpty()) {
+                break;
+            }
             try {
-                if (isReadyToWrite()) {
+                if (block.isFull()){
                     systemLogger.info(getName() + ": Ready to write");
-                    // write succeeds, store offset to db
-                    if (writer.write(writerQueue)) {
-                        commitOffset(writerQueue);
+                    // construct block.
+                    block.construct();
+                    // write to file
+                    String filename = writer.write(block.getFiberId(),
+                            block.getContent(),
+                            block.getBlockMinTimestamp(),
+                            block.getBlockMaxTimestamp());
+                    // write succeeds, commit meta
+                    if (filename != null) {
+                        for (Meta meta: block.getMetas()) {
+                            commitMeta(meta.getFiberId(),
+                                    meta.getBeginTime(),
+                                    meta.getEndTime(),
+                                    filename);
+                        }
+//                        commitOffset(writerQueue);
+                        // clear block content
+                        systemLogger.info("Write success, clear block");
+                        block.clear();
+                    } else {
+                        // TODO file write failed
                     }
                 }
                 Batch msgBatch = queue.take();
-                writerQueue.add(msgBatch);
+                systemLogger.info("SimpleWriterThread add batch");
+                block.addBatch(msgBatch);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            } finally {
-//                writer.write(writerQueue);
             }
         }
-    }
-
-    public boolean isReadyToWrite() {
-        if (this.writerQueue.size() >= (blockSize * fullFactor)) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -91,6 +101,14 @@ public class SimpleWriterThread extends WriterThread {
         }
         // commit offsets of whole block to storage
 //        dbConnection.commitPartitionOffsets(commitMap);
+    }
+
+    /**
+     * Commit to meta server
+     * fiberId, beginTime, endTime, filename
+     * */
+    public void commitMeta(int fiberId, long beginTime, long endTime, String filename) {
+        System.out.print("Meta: " + fiberId + "-" + beginTime + "-" + endTime + "-" + filename);
     }
 
     public String getName() {

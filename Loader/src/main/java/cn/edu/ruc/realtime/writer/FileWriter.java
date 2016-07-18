@@ -1,39 +1,42 @@
 package cn.edu.ruc.realtime.writer;
 
-import cn.edu.ruc.realtime.model.Batch;
 import cn.edu.ruc.realtime.model.Message;
+import cn.edu.ruc.realtime.utils.ConfigFactory;
 import cn.edu.ruc.realtime.utils.Output;
-import org.apache.jasper.tagplugins.jstl.core.Out;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Queue;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Jelly
  */
 public class FileWriter implements Writer {
     private BufferedWriter writer;
+    private ConfigFactory configFactory = ConfigFactory.getInstance();
+    private final String basePath = configFactory.getWriterFilePath();
 
-    public FileWriter(String path) {
-        try {
-            writer = Output.getBufferedWriter(path, 1*1024);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public FileWriter() {
     }
 
     @Override
-    public synchronized boolean write(Queue<Batch> queue) {
-        Message msg;
-        while (queue.peek() != null) {
+    public synchronized String write(Set<Integer> ids, List<Message> messages, long beginTime, long endTime) {
+        StringBuilder sb = new StringBuilder();
+        int counter = 0;
+        Iterator<Integer> iterator = ids.iterator();
+        sb.append(basePath);
+        while (iterator.hasNext() && counter < 5) {
+            sb.append(iterator.next());
+        }
+        sb.append(beginTime);
+        sb.append(endTime);
+        sb.append(Math.random()*endTime);
+        writer = Output.getBufferedWriter(sb.toString(), 8*1024);
+        for (Message msg: messages) {
             try {
-                Iterator<Message> iterator = queue.poll().getIterator();
-                while (iterator.hasNext()) {
-                    msg = iterator.next();
-                    writer.write(msg.getKey() + "-" + msg.getTimestamp() + ": " + msg.getValue() + "\n");
-                }
+                writer.write(msg.getStringKey() + "-" +msg.getTimestamp() + ": " + msg.getValue() + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -41,10 +44,10 @@ public class FileWriter implements Writer {
         try {
             System.out.println("Flush and shutdown");
             writer.flush();
-            return true;
+            return sb.toString();
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 }

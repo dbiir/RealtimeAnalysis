@@ -13,7 +13,7 @@ public class Output {
      * @param path file path to write
      * @param buffSize writer buffer size
      * */
-    public static BufferedWriter getBufferedWriter(String path, int buffSize) throws IOException {
+    public static BufferedWriter getBufferedWriter(String path, int buffSize) {
         BufferedWriter bufferedWriter = new BufferedWriter(getFileWriter(path), buffSize);
         return bufferedWriter;
     }
@@ -22,9 +22,14 @@ public class Output {
      * Get a file writer
      * @param path file path to write
      * */
-    public static FileWriter getFileWriter(String path) throws IOException {
-        FileWriter fWiter = new FileWriter(path);
-        return fWiter;
+    public static FileWriter getFileWriter(String path) {
+        try {
+            FileWriter fWiter = new FileWriter(path);
+            return fWiter;
+        } catch (IOException e) {
+            // TODO
+        }
+        return null;
     }
 
     /**

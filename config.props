@@ -35,5 +35,5 @@ blocking.queue.size=12288
 ## WriterThread
 writer.block.size=10
 writer.full.factor=0.98
-writer.file.path=/Users/Jelly/Developer/RealTimeAnalysis/result
+writer.file.path=/Users/Jelly/Developer/RealTimeAnalysis/
 writer.thread.num=1

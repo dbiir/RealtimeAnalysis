@@ -56,8 +56,11 @@ class KafkaProducerThread implements Runnable {
 
     @Override
     public void run() {
-        Message msg = new Message(100L, "1000000");
-        producer.send(new ProducerRecord("test", msg.getKey(), msg));
-        producer.close();
+        for (int i = 0; i < 5000; i++) {
+            Message msg = new Message(Long.valueOf(i), "test000"+i);
+            msg.setTimestamp(System.currentTimeMillis());
+            producer.send(new ProducerRecord("test07190235", msg.getKey(), msg));
+        }
+//        producer.close();
     }
 }

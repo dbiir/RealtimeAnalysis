@@ -1,10 +1,9 @@
 package cn.edu.ruc.realtime.writer;
 
-import cn.edu.ruc.realtime.model.Batch;
 import cn.edu.ruc.realtime.model.Message;
 
-import java.util.Collection;
-import java.util.Queue;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Jelly
@@ -13,8 +12,8 @@ public interface Writer {
 
     /**
      * Write out.
-     * @param queue batches
-     * @return if success, return true
+     * @param messages messages
+     * @return if success, return filename
      * */
-    public boolean write(Queue<Batch> queue);
+    public String write(Set<Integer> ids, List<Message> messages, long beginTimestamp, long endTimestamp);
 }

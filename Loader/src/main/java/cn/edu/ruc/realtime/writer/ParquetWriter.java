@@ -1,5 +1,6 @@
 package cn.edu.ruc.realtime.writer;
 
+import cn.edu.ruc.realtime.model.Message;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.column.ParquetProperties;
@@ -10,7 +11,9 @@ import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.MessageTypeParser;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * @author Jelly
@@ -72,7 +75,6 @@ public class ParquetWriter implements Writer {
         }
     }
 
-    @Override
     public boolean write(Queue queue) {
         groupWriteSupport.setSchema(schema, conf);
         while (queue.peek() != null) {
@@ -113,5 +115,10 @@ public class ParquetWriter implements Writer {
             }
         }
         return true;
+    }
+
+    @Override
+    public String write(Set<Integer> ids, List<Message> messages, long beginTimestamp, long endTimestamp) {
+        return null;
     }
 }

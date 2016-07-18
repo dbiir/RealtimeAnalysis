@@ -48,8 +48,9 @@ public class ThreadManager {
             executor.execute(loader);
         }
         for (int i = 0; i < writerThreadNum; i++) {
-//            SimpleWriterThread writer = new SimpleWriterThread("Writer-" + topic + "-" + i, queue);
-            WriterThread writer = new ConsoleWriterThread(queue);
+            System.out.println();
+            SimpleWriterThread writer = new SimpleWriterThread("Writer-" + topic + "-" + i, queue);
+//            WriterThread writer = new ConsoleWriterThread(queue);
             writerMap.add(writer);
             executor.execute(writer);
         }

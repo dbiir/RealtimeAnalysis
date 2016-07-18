@@ -28,7 +28,7 @@ public class LoaderClientTest {
 //        BufferedReader reader = new BufferedReader(new FileReader("/home/kafka/lineorders000"));
         List<Message> messageList = new LinkedList<>();
 
-        String topic = "test01";
+        String topic = "test02";
         String line;
 
         LoaderClient client = new LoaderClient(topic);
@@ -40,8 +40,11 @@ public class LoaderClientTest {
 //            messageList.add(message);
 //        }
 
-        for (int i = 0; i < 1000; i++) {
+        int base = 0;
+        for (int i = base; i < base+5000; i++) {
             Message message = new Message(Long.valueOf(i), "test"+i);
+            long time = (long) Math.ceil(System.currentTimeMillis() * Math.random());
+            message.setTimestamp(time);
             messageList.add(message);
         }
         long before = System.currentTimeMillis();
