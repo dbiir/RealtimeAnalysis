@@ -1,16 +1,11 @@
 package cn.edu.ruc.realtime.threads;
 
 /**
- * RealTimeAnalysis
- *
- * @author Jelly
+ * Created by Jelly on 7/14/16.
  */
-public abstract class WriterThread implements Runnable {
-    /**
-     * Get thread name.
-     * */
-    public abstract String getName();
+public abstract class ProducerThread implements Runnable {
 
+    public abstract String getThreadName();
 
     /**
      * Set isReadyToStop signal.

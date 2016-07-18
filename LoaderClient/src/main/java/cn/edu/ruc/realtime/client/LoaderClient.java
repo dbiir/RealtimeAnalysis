@@ -1,9 +1,10 @@
 package cn.edu.ruc.realtime.client;
 
 import cn.edu.ruc.realtime.model.Message;
-import cn.edu.ruc.realtime.threads.ConsumerThreadPool;
-import cn.edu.ruc.realtime.threads.KafkaConsumerThread;
-import cn.edu.ruc.realtime.threads.SimpleConsumerThread;
+import cn.edu.ruc.realtime.threads.ProducerThread;
+import cn.edu.ruc.realtime.threads.ProducerThreadPool;
+import cn.edu.ruc.realtime.threads.KafkaProducerThread;
+import cn.edu.ruc.realtime.threads.SimpleProducerThread;
 import cn.edu.ruc.realtime.utils.Log;
 import cn.edu.ruc.realtime.utils.LogFactory;
 
@@ -36,7 +37,7 @@ import java.util.List;
  * </code>
  */
 public class LoaderClient {
-    private ConsumerThreadPool loaderPool;
+    private ProducerThreadPool loaderPool;
     private String topic;
     private Log systemLogger;
 
@@ -45,9 +46,10 @@ public class LoaderClient {
      * */
     public LoaderClient(String topic) {
         this.topic = topic;
-        loaderPool = new ConsumerThreadPool(topic);
+        loaderPool = new ProducerThreadPool(topic);
         for (int i = 0; i < 1; i++) {
-            KafkaConsumerThread thread = new KafkaConsumerThread(topic, "KafkaConsumer" + i, loaderPool.getQueue());
+            ProducerThread thread = new KafkaProducerThread(topic, "KafkaProducer" + i, loaderPool.getQueue());
+//            ProducerThread thread = new SimpleProducerThread("SimpleProducer" + i, loaderPool.getQueue());
             loaderPool.addConsumer(thread);
         }
         loaderPool.execute();
@@ -86,10 +88,6 @@ public class LoaderClient {
      * */
     public void shutdown() {
         loaderPool.shutdown();
-        System.out.println("Client for " + topic + " shutdown");
-        systemLogger.info("Client for " + topic + " shutdown");
-        while (!loaderPool.isTerminated()) {
-//            System.out.println("Thread not shut down.");
-        }
+        systemLogger.info("Client for " + topic + " hints to shutdown");
     }
 }

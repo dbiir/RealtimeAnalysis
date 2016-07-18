@@ -28,7 +28,7 @@ public class LoaderClientTest {
 //        BufferedReader reader = new BufferedReader(new FileReader("/home/kafka/lineorders000"));
         List<Message> messageList = new LinkedList<>();
 
-        String topic = "test07051224";
+        String topic = "test01";
         String line;
 
         LoaderClient client = new LoaderClient(topic);
@@ -41,13 +41,12 @@ public class LoaderClientTest {
 //        }
 
         for (int i = 0; i < 1000; i++) {
-            Message<String, String> message = new Message<>(String.valueOf(i), "test"+i);
+            Message message = new Message(Long.valueOf(i), "test"+i);
             messageList.add(message);
         }
         long before = System.currentTimeMillis();
         System.out.println("Start loading...");
         client.sendMessages(messageList);
-
         System.out.println("Loading ended. Cost: " + (System.currentTimeMillis() - before) + "ms");
         client.shutdown();
     }

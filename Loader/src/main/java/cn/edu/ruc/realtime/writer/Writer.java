@@ -1,14 +1,20 @@
 package cn.edu.ruc.realtime.writer;
 
 import cn.edu.ruc.realtime.model.Batch;
+import cn.edu.ruc.realtime.model.Message;
 
 import java.util.Collection;
 import java.util.Queue;
 
 /**
- * Created by Jelly on 6/30/16.
+ * @author Jelly
  */
-public interface Writer<T> {
+public interface Writer {
 
-    public boolean write(Queue<Batch<T>> queue);
+    /**
+     * Write out.
+     * @param queue batches
+     * @return if success, return true
+     * */
+    public boolean write(Queue<Batch> queue);
 }

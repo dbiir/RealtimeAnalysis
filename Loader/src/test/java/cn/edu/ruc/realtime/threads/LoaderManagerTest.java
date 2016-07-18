@@ -18,7 +18,7 @@ public class LoaderManagerTest {
         // load config
         ConfigFactory configFactory = ConfigFactory.getInstance(args[0]);
 
-        LoaderManager manager = new LoaderManager("test07051224", 10);
+        ThreadManager manager = new ThreadManager("test07051224", 10);
         manager.execute();
 
         System.out.println("Loading...");

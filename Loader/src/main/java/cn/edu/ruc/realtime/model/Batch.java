@@ -5,13 +5,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by Jelly on 7/10/16.
+ * @author Jelly
  * Batch used as loader thread buffer.
  */
-public class Batch<T> {
-    private long lastOffset;
+public class Batch {
+    private long firstOffset = 0L;
+    private long lastOffset = 0L;
     private int partition;
-    private List<T> batchContent;
+    private List<Message> batchContent;
     private int capacity;
 
     public Batch(int capacity, int partition) {
@@ -31,31 +32,45 @@ public class Batch<T> {
         return this.lastOffset;
     }
 
+    public long getFirstOffset() {
+        return this.firstOffset;
+    }
+
     public int getPartition() {
         return this.partition;
     }
 
-    public void addMsg(T msg, long offset) {
+    public void addMsg(Message msg, long offset) {
         if (offset > getLastOffset()) {
             this.lastOffset = offset;
+        }
+        if (offset < getFirstOffset()) {
+            this.firstOffset = offset;
         }
         batchContent.add(msg);
     }
 
-    public Iterator<T> getIterator() {
+    public Iterator<Message> getIterator() {
         return batchContent.iterator();
     }
 
     public void clear() {
         batchContent.clear();
+        firstOffset = 0L;
+        lastOffset = 0L;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (T e: batchContent) {
-            sb.append(e);
+        sb.append(firstOffset).append("<");
+        for (Message e: batchContent) {
+            sb.append(e.toString()).append(" ");
         }
-        sb.append("-").append(lastOffset);
+        sb.append(">").append(lastOffset);
         return sb.toString();
+    }
+
+    public int getSize() {
+        return batchContent.size();
     }
 }

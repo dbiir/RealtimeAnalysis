@@ -7,13 +7,12 @@ import cn.edu.ruc.realtime.utils.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.*;
 
 /**
  * @author Jelly
  */
-public class ConsumerThreadPool {
+public class ProducerThreadPool {
     // default thread pool size is equal to physical thread num: 2 * (num of processors)
     private int threadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
     private ConfigFactory config = ConfigFactory.getInstance();
@@ -23,13 +22,13 @@ public class ConsumerThreadPool {
     // kafka topic
     private String topic;
     // consumer thread list
-    private List<ConsumerThread> consumerList;
+    private List<ProducerThread> consumerList;
     // default blocking array queue size
     private int queueSize = 1000;
     // default logger
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
 
-    public ConsumerThreadPool(String topic) {
+    public ProducerThreadPool(String topic) {
         // if customized thread pool size is larger, set to customized one, else stick to default
         if (config.getThreadPoolSize() > threadPoolSize)
             threadPoolSize = config.getThreadPoolSize();
@@ -44,21 +43,20 @@ public class ConsumerThreadPool {
 
     public void execute() {
         systemLogger.info("Execute threads num: " + threadPoolSize);
-        for (ConsumerThread consumerThread: consumerList) {
-            executor.execute(consumerThread);
-            systemLogger.info("Launch thread " + consumerThread.getThreadName());
+        for (ProducerThread producerThread : consumerList) {
+            executor.execute(producerThread);
+            systemLogger.info("Launch thread " + producerThread.getThreadName());
         }
     }
 
     public void shutdown() {
-        for (ConsumerThread consumerThread: consumerList) {
-//            consumerThread.interrupt();
-            consumerThread.setReadyToStop();
+        for (ProducerThread producerThread : consumerList) {
+            producerThread.setReadyToStop();
         }
         executor.shutdown();
-        if (!isTerminated()) {
-            shutdownNow();
-        }
+//        if (!isTerminated()) {
+//            shutdownNow();
+//        }
         systemLogger.info("Executor shutdown");
     }
 
@@ -78,7 +76,7 @@ public class ConsumerThreadPool {
         }
     }
 
-    public void addConsumer(ConsumerThread consumer) {
+    public void addConsumer(ProducerThread consumer) {
         consumerList.add(consumer);
     }
 

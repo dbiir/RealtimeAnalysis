@@ -3,8 +3,6 @@ package cn.edu.ruc.realtime.writer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.column.ParquetProperties;
-import org.apache.parquet.example.data.Group;
-import org.apache.parquet.example.data.simple.IntegerValue;
 import org.apache.parquet.example.data.simple.SimpleGroupFactory;
 import org.apache.parquet.hadoop.example.GroupWriteSupport;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
@@ -15,7 +13,7 @@ import java.io.IOException;
 import java.util.Queue;
 
 /**
- * Created by Jelly on 6/30/16.
+ * @author Jelly
  * Parquet Writer
  */
 public class ParquetWriter implements Writer {

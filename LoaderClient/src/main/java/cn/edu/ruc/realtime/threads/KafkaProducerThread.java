@@ -10,7 +10,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -18,18 +17,18 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by Jelly on 6/12/16.
  * Thread puts message into Kafka
  */
-public class KafkaConsumerThread<K, V> extends ConsumerThread {
+public class KafkaProducerThread extends ProducerThread {
     private String topic;
     private String threadName;
     private ConfigFactory config = ConfigFactory.getInstance();
-    private Producer<K, V> producer;
+    private Producer<Long, Message> producer;
     private Properties props;
     private BlockingQueue<Message> queue;
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
     private AtomicLong msgCounter = new AtomicLong(0L);
 
-    public KafkaConsumerThread(String topic, String threadName, BlockingQueue<Message> queue) {
+    public KafkaProducerThread(String topic, String threadName, BlockingQueue<Message> queue) {
         this.topic = topic;
         this.threadName = threadName;
         this.queue = queue;
@@ -49,14 +48,17 @@ public class KafkaConsumerThread<K, V> extends ConsumerThread {
         producer = new KafkaProducer(props);
     }
 
-    public void sendMessage(Message<K, V> message) {
-        producer.send(new ProducerRecord(topic, String.valueOf(message.getKey()), message.getValue()));
+    public void sendMessage(Message message) {
+        producer.send(new ProducerRecord(topic, message.getKey(), message));
     }
 
     @Override
     public void run() {
         long before = System.currentTimeMillis();
-        while (!readyToStop()) {
+        while (true){
+            if (readyToStop() && queue.isEmpty()) {
+                break;
+            }
             try {
                 sendMessage(queue.take());
                 msgCounter.getAndIncrement();

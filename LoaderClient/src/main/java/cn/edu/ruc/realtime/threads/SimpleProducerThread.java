@@ -9,13 +9,13 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author Jelly
  */
-public class SimpleConsumerThread extends ConsumerThread {
+public class SimpleProducerThread extends ProducerThread {
     private String threadName;
     private BlockingQueue<Message> blockingQueue;
     private AtomicLong msgCounter = new AtomicLong(0L);
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
 
-    public SimpleConsumerThread(String threadName, BlockingQueue<Message> blockingQueue) {
+    public SimpleProducerThread(String threadName, BlockingQueue<Message> blockingQueue) {
         this.threadName = threadName;
         this.blockingQueue = blockingQueue;
     }
@@ -28,19 +28,18 @@ public class SimpleConsumerThread extends ConsumerThread {
     @Override
     public void run() {
         long before = System.currentTimeMillis();
-        while (!readyToStop()) {
+        while (true){
             if (readyToStop() && blockingQueue.isEmpty()) {
-                blockingQueue = null;
                 break;
-            } else {
-                try {
-                    blockingQueue.take();
-                    msgCounter.getAndIncrement();
-                } catch (InterruptedException e) {
+            }
+            try {
+                blockingQueue.take();
+                msgCounter.getAndIncrement();
+            } catch (InterruptedException e) {
 
-                }
             }
         }
+        blockingQueue = null;
         long end = System.currentTimeMillis();
         System.out.println("Consumed messages: " + msgCounter.get() + " Cost: " + (end - before) + " ms");
     }

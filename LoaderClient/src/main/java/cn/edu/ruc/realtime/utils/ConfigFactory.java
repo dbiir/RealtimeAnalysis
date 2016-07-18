@@ -286,7 +286,7 @@ public class ConfigFactory {
         } catch (PropertyNotExistException e) {
             systemLogger.exception(e);
         }
-        return "org.apache.kafka.common.serialization.StringDeserializer";
+        return "org.apache.kafka.common.serialization.LongDeserializer";
     }
 
     public String getConsumerValueDeserializer() {
@@ -295,7 +295,7 @@ public class ConfigFactory {
         } catch (PropertyNotExistException e) {
             systemLogger.exception(e);
         }
-        return "org.apache.kafka.common.serialization.StringDeserializer";
+        return "cn.edu.ruc.realtime.utils.MessageDer";
     }
 
     public String getWriterFilePath() {

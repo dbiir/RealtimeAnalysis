@@ -16,13 +16,15 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Jelly on 6/29/16.
  */
-public class ParquetWriterThread {
+public class ParquetWriterThread extends WriterThread {
     private BlockingQueue<ConsumerRecord> queue;
     private Collection<ConsumerRecord> list = new LinkedList();
+    private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
 
     public ParquetWriterThread(BlockingQueue queue) {
         this.queue = queue;
@@ -65,5 +67,20 @@ public class ParquetWriterThread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String getName() {
+        return "Writer";
+    }
+
+    @Override
+    public void setReadyToStop() {
+        isReadyToStop.set(true);
+    }
+
+    @Override
+    public boolean readyToStop() {
+        return isReadyToStop.get();
     }
 }

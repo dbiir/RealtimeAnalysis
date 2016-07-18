@@ -1,6 +1,6 @@
 package cn.edu.ruc.realtime.loader;
 
-import cn.edu.ruc.realtime.threads.LoaderManager;
+import cn.edu.ruc.realtime.threads.ThreadManager;
 
 /**
  * Created by Jelly on 6/29/16.
@@ -15,9 +15,7 @@ public class Loader {
     }
 
     public void load() {
-        LoaderManager manager = new LoaderManager(topic, partitionNum);
+        ThreadManager manager = new ThreadManager(topic, partitionNum);
         manager.execute();
-
-//        manager.shutdown();
     }
 }

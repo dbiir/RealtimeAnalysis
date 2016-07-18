@@ -1,6 +1,7 @@
 package cn.edu.ruc.realtime.writer;
 
 import cn.edu.ruc.realtime.model.Batch;
+import cn.edu.ruc.realtime.model.Message;
 import cn.edu.ruc.realtime.utils.Output;
 import org.apache.jasper.tagplugins.jstl.core.Out;
 
@@ -10,9 +11,9 @@ import java.util.Iterator;
 import java.util.Queue;
 
 /**
- * Created by Jelly on 7/1/16.
+ * @author Jelly
  */
-public class FileWriter<T> implements Writer<T> {
+public class FileWriter implements Writer {
     private BufferedWriter writer;
 
     public FileWriter(String path) {
@@ -24,12 +25,14 @@ public class FileWriter<T> implements Writer<T> {
     }
 
     @Override
-    public synchronized boolean write(Queue<Batch<T>> queue) {
+    public synchronized boolean write(Queue<Batch> queue) {
+        Message msg;
         while (queue.peek() != null) {
             try {
-                Iterator iterator = queue.poll().getIterator();
+                Iterator<Message> iterator = queue.poll().getIterator();
                 while (iterator.hasNext()) {
-                    writer.write(String.valueOf(iterator.next()) + "\n");
+                    msg = iterator.next();
+                    writer.write(msg.getKey() + "-" + msg.getTimestamp() + ": " + msg.getValue() + "\n");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
