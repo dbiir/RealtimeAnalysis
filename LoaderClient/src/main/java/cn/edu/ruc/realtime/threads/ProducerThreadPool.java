@@ -52,6 +52,7 @@ public class ProducerThreadPool {
     public void shutdown() {
         for (ProducerThread producerThread : consumerList) {
             producerThread.setReadyToStop();
+//            producerThread.close();
         }
         executor.shutdown();
 //        if (!isTerminated()) {

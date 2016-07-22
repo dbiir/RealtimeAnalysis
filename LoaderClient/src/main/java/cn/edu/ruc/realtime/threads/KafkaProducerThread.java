@@ -56,7 +56,8 @@ public class KafkaProducerThread extends ProducerThread {
     public void run() {
         long before = System.currentTimeMillis();
         while (true){
-            if (readyToStop() && queue.isEmpty()) {
+            if (readyToStop()) {
+                producer.close();
                 break;
             }
             try {
@@ -80,6 +81,10 @@ public class KafkaProducerThread extends ProducerThread {
     }
 
     public boolean readyToStop() {
-        return isReadyToStop.get();
+        return isReadyToStop.get() && queue.isEmpty();
+    }
+
+    public void close() {
+//        producer.close();
     }
 }

@@ -23,7 +23,7 @@ public class KafkaProducerTest {
     }
 
     public void execute() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             executor.execute(new KafkaProducerThread());
         }
         executor.shutdown();
@@ -48,19 +48,24 @@ class KafkaProducerThread implements Runnable {
         props.put("bootstrap.servers", "127.0.0.1:9092");
         props.put("key.serializer", "org.apache.kafka.common.serialization.LongSerializer");
         props.put("value.serializer", "cn.edu.ruc.realtime.utils.MessageSer");
+//        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         // partition class
         props.put("partitioner.class", "cn.edu.ruc.realtime.partition.LoaderClientPartitionKafka");
 
         producer = new KafkaProducer(props);
     }
 
+    int counter = 0;
+
     @Override
     public void run() {
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < 6010; i++) {
             Message msg = new Message(Long.valueOf(i), "test000"+i);
             msg.setTimestamp(System.currentTimeMillis());
-            producer.send(new ProducerRecord("test07190235", msg.getKey(), msg));
+            producer.send(new ProducerRecord("07221918", Long.valueOf(i), msg));
+            counter++;
         }
-//        producer.close();
+        producer.close();
+        System.out.println("Done " + counter);
     }
 }

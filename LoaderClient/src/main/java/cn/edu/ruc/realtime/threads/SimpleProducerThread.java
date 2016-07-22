@@ -51,4 +51,7 @@ public class SimpleProducerThread extends ProducerThread {
     public boolean readyToStop() {
         return isReadyToStop.get();
     }
+
+    public void close() {
+    }
 }

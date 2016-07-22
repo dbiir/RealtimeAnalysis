@@ -16,4 +16,9 @@ public abstract class ProducerThread implements Runnable {
      * Get isReadyToStop signal.
      * */
     public abstract boolean readyToStop();
+
+    /**
+     * Close Producer. Make sure buffer is flushed out
+     * */
+    public abstract void close();
 }
