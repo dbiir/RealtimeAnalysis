@@ -21,19 +21,20 @@ public class KafkaProducerThread extends ProducerThread {
     private String topic;
     private String threadName;
     private ConfigFactory config = ConfigFactory.getInstance();
-    private Producer<Long, Message> producer;
-    private Properties props;
     private BlockingQueue<Message> queue;
+    private Properties props = new Properties();
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
+
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
     private AtomicLong msgCounter = new AtomicLong(0L);
+
+    private Producer<Long, Message> producer;
 
     public KafkaProducerThread(String topic, String threadName, BlockingQueue<Message> queue) {
         this.topic = topic;
         this.threadName = threadName;
         this.queue = queue;
 
-        props = new Properties();
         props.put("acks", config.getAcks());
         props.put("retries", config.getRetries());
         props.put("batch.size", config.getBatchSize());
@@ -48,10 +49,6 @@ public class KafkaProducerThread extends ProducerThread {
         producer = new KafkaProducer(props);
     }
 
-    public void sendMessage(Message message) {
-        producer.send(new ProducerRecord(topic, message.getKey(), message));
-    }
-
     @Override
     public void run() {
         long before = System.currentTimeMillis();
@@ -61,14 +58,15 @@ public class KafkaProducerThread extends ProducerThread {
                 break;
             }
             try {
-                sendMessage(queue.take());
+                Message msg = queue.take();
+                producer.send(new ProducerRecord(topic, msg.getKey(), msg));
                 msgCounter.getAndIncrement();
             } catch (InterruptedException e) {
                 systemLogger.exception(e);
             }
         }
         long end = System.currentTimeMillis();
-        System.out.println("Sending " + msgCounter.get() + " messages. Cost: " + (end -before) + " ms");
+        System.out.println("Sending " + msgCounter.get() + " messages. Done: " + end + " ms");
     }
 
     public String getThreadName() {

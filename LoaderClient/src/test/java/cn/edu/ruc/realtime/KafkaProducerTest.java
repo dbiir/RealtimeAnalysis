@@ -60,9 +60,9 @@ class KafkaProducerThread implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < 6010; i++) {
-            Message msg = new Message(Long.valueOf(i), "test000"+i);
+            Message msg = new Message(i, "test000"+i);
             msg.setTimestamp(System.currentTimeMillis());
-            producer.send(new ProducerRecord("07221918", Long.valueOf(i), msg));
+            producer.send(new ProducerRecord("07221918", 1L, msg));
             counter++;
         }
         producer.close();

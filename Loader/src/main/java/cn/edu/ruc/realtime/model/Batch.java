@@ -7,6 +7,7 @@ import java.util.List;
 /**
  * @author Jelly
  * Batch used as loader thread buffer.
+ * Not thread safe
  */
 public class Batch {
     private long firstOffset = 0L;
@@ -97,5 +98,9 @@ public class Batch {
 
     public int getSize() {
         return batchContent.size();
+    }
+
+    public boolean isEmpty() {
+        return batchContent.size() > 0;
     }
 }

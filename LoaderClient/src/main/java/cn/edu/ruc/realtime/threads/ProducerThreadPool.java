@@ -11,6 +11,8 @@ import java.util.concurrent.*;
 
 /**
  * @author Jelly
+ *
+ * Thread pool for {@link ProducerThread}. Send messages into Kafka
  */
 public class ProducerThreadPool {
     // default thread pool size is equal to physical thread num: 2 * (num of processors)
@@ -52,12 +54,8 @@ public class ProducerThreadPool {
     public void shutdown() {
         for (ProducerThread producerThread : consumerList) {
             producerThread.setReadyToStop();
-//            producerThread.close();
         }
         executor.shutdown();
-//        if (!isTerminated()) {
-//            shutdownNow();
-//        }
         systemLogger.info("Executor shutdown");
     }
 

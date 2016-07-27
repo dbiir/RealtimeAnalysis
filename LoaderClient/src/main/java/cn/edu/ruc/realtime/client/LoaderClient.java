@@ -5,6 +5,7 @@ import cn.edu.ruc.realtime.threads.ProducerThread;
 import cn.edu.ruc.realtime.threads.ProducerThreadPool;
 import cn.edu.ruc.realtime.threads.KafkaProducerThread;
 import cn.edu.ruc.realtime.threads.SimpleProducerThread;
+import cn.edu.ruc.realtime.utils.ConfigFactory;
 import cn.edu.ruc.realtime.utils.Log;
 import cn.edu.ruc.realtime.utils.LogFactory;
 
@@ -40,6 +41,8 @@ public class LoaderClient {
     private ProducerThreadPool loaderPool;
     private String topic;
     private Log systemLogger;
+    private ConfigFactory configFactory = ConfigFactory.getInstance();
+    private int producerTNum = configFactory.getProducerThreadNum();
 
     /**
      * @param topic every client has one topic
@@ -47,7 +50,7 @@ public class LoaderClient {
     public LoaderClient(String topic) {
         this.topic = topic;
         loaderPool = new ProducerThreadPool(topic);
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < producerTNum; i++) {
             ProducerThread thread = new KafkaProducerThread(topic, "KafkaProducer" + i, loaderPool.getQueue());
 //            ProducerThread thread = new SimpleProducerThread("SimpleProducer" + i, loaderPool.getQueue());
             loaderPool.addConsumer(thread);

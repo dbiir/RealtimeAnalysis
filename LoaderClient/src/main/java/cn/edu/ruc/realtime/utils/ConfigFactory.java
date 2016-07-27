@@ -405,4 +405,15 @@ public class ConfigFactory {
         }
         return 1;
     }
+
+    public int getProducerThreadNum() {
+        try {
+            return Integer.parseInt(getProps("producer.thread.num"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 1;
+    }
 }

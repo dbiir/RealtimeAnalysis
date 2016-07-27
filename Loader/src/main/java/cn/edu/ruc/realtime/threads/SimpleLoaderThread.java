@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Jelly on 6/29/16.
@@ -28,20 +30,29 @@ public class SimpleLoaderThread extends LoaderThread {
     private String topic;
     private int partition;
     private BlockingQueue<Batch> queue;
+    private Properties props = new Properties();
 
     private final ConfigFactory configFactory = ConfigFactory.getInstance();
-    private final KafkaConsumer consumer;
     private final int batchSize = configFactory.getWriterBatchSize();
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
 
+    private KafkaConsumer consumer;
+
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
+    private AtomicLong counter = new AtomicLong(0L);
+    private AtomicInteger batchCounter = new AtomicInteger(0);
+    private final ThreadLocal<Batch> localBatch = new ThreadLocal<Batch>() {
+        @Override
+        protected Batch initialValue() {
+            return new Batch(batchSize, partition);
+        }
+    };
 
     public SimpleLoaderThread(String topic, int partition, BlockingQueue<Batch> queue) {
         this.topic = topic;
         this.partition = partition;
         this.queue = queue;
 
-        Properties props = new Properties();
         props.put("bootstrap.servers", configFactory.getBootstrapServers());
         props.put("group.id", configFactory.getConsumerGroupId());
         props.put("enable.auto.commit", configFactory.getConsumerAutoCommit());
@@ -50,37 +61,50 @@ public class SimpleLoaderThread extends LoaderThread {
         props.put("key.deserializer", configFactory.getConsumerKeyDeserializer());
         props.put("value.deserializer", configFactory.getConsumerValueDeserializer());
 
-        consumer = new KafkaConsumer(props);
-        TopicPartition topicPartition = new TopicPartition(topic, partition);
-        assginPartition(topicPartition);
-        // TODO seek to the beginning, just for test, should consult the meta server.
-        consumer.seekToBeginning(topicPartition);
     }
 
     @Override
     public void run() {
-        while (!readyToStop()){
-            Batch batch = new Batch(batchSize, partition);
+        consumer = new KafkaConsumer(props);
+        TopicPartition topicPartition = new TopicPartition(topic, partition);
+        System.out.println("Parition: " + topicPartition.partition());
+        consumer.assign(Arrays.asList(topicPartition));
+        // TODO seek to the beginning, just for test, should consult the meta server.
+        consumer.seekToBeginning(topicPartition);
+        int msgCounter = 0;
+        int batchCounter = 0;
+
+        while (true){
+            if (readyToStop()) {
+                try {
+                    if (!localBatch.get().isEmpty()) {
+                        queue.put(localBatch.get());
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
             ConsumerRecords<Long, Message> records = consumer.poll(1000);
             for (ConsumerRecord<Long, Message> record: records) {
-                systemLogger.info(getName() + record.value());
+//                counter.getAndIncrement();
+                msgCounter++;
                 try {
-                    if (batch.isFull()) {
-                        queue.put(batch);
-                        batch = new Batch(batchSize, partition);
+                    if (localBatch.get().isFull()) {
+                        queue.put(localBatch.get());
+                        System.out.println(queue.size());
+                        localBatch.set(new Batch(batchSize, partition));
+//                        batchCounter.getAndIncrement();
+                        batchCounter++;
                     }
-                    batch.addMsg(record.value(), record.offset());
-                } catch (InterruptedException e) {
+                    localBatch.get().addMsg(record.value(), record.offset());
+                } catch (Exception e) {
                     systemLogger.exception(e);
                 }
             }
+            systemLogger.info("Partition: " + getPartition() + ", message counter: " + msgCounter);
+            systemLogger.info("Partition: " + getPartition() + ", batch counter: " + batchCounter);
         }
-    }
-
-    public void assginPartition(TopicPartition topicPartition) {
-        this.topic = topicPartition.topic();
-        this.partition = topicPartition.partition();
-        consumer.assign(Arrays.asList(topicPartition));
     }
 
     public String getTopic() {

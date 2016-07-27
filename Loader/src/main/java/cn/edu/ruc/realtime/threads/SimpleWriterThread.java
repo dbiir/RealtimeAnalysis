@@ -5,11 +5,14 @@ import cn.edu.ruc.realtime.model.Block;
 import cn.edu.ruc.realtime.model.Meta;
 import cn.edu.ruc.realtime.utils.*;
 import cn.edu.ruc.realtime.writer.FileWriter;
+import cn.edu.ruc.realtime.writer.HadoopWriter;
 import cn.edu.ruc.realtime.writer.Writer;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Jelly on 6/29/16.
@@ -20,13 +23,13 @@ public class SimpleWriterThread extends WriterThread {
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
     private String threadName;
     private BlockingQueue<Batch> queue;
-    private Block block = new Block();
     private Writer writer;
     private HashMap<Integer, Long> offsetMap = new HashMap<>();
-//    private DBConnection dbConnection = new PostgresConnection();
+    private DBConnection dbConnection = new PostgresConnection();
 
     // isReadyToStop signal
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
+    private AtomicLong counter = new AtomicLong(0L);
 
     public SimpleWriterThread(String threadName, BlockingQueue queue) {
         this.threadName = threadName;
@@ -35,45 +38,53 @@ public class SimpleWriterThread extends WriterThread {
 
     @Override
     public void run() {
+        Block block = new Block();
         //TODO Add time limit
         systemLogger.info(getName() + ": started");
         writer = new FileWriter();
+//        writer = new HadoopWriter();
         while (true) {
-            if (readyToStop() && queue.isEmpty()) {
+            if (readyToStop()) {
+                writerBlock(block);
                 break;
             }
             try {
                 if (block.isFull()){
                     systemLogger.info(getName() + ": Ready to write");
-                    // construct block.
-                    block.construct();
-                    // write to file
-                    String filename = writer.write(block.getFiberId(),
-                            block.getContent(),
-                            block.getBlockMinTimestamp(),
-                            block.getBlockMaxTimestamp());
-                    // write succeeds, commit meta
-                    if (filename != null) {
-                        for (Meta meta: block.getMetas()) {
-                            commitMeta(meta.getFiberId(),
-                                    meta.getBeginTime(),
-                                    meta.getEndTime(),
-                                    filename);
-                        }
-//                        commitOffset(writerQueue);
-                        // clear block content
-                        systemLogger.info("Write success, clear block");
-                        block.clear();
-                    } else {
-                        // TODO file write failed
-                    }
+                    writerBlock(block);
                 }
                 Batch msgBatch = queue.take();
+                counter.getAndIncrement();
                 systemLogger.info("SimpleWriterThread add batch");
+                systemLogger.info("Writer thread, block counter: " + counter.get());
                 block.addBatch(msgBatch);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void writerBlock(Block block) {
+        block.construct();
+        // write to file
+        String filename = writer.write(block.getFiberId(),
+                block.getContent(),
+                block.getBlockMinTimestamp(),
+                block.getBlockMaxTimestamp());
+        // write succeeds, commit meta
+        if (filename != null) {
+            for (Meta meta: block.getMetas()) {
+                commitMeta(meta.getFiberId(),
+                        meta.getBeginTime(),
+                        meta.getEndTime(),
+                        filename);
+            }
+//                        commitOffset(writerQueue);
+            // clear block content
+            systemLogger.info("Write success, clear block");
+            block.clear();
+        } else {
+            // TODO file write failed
         }
     }
 
@@ -108,7 +119,8 @@ public class SimpleWriterThread extends WriterThread {
      * fiberId, beginTime, endTime, filename
      * */
     public void commitMeta(int fiberId, long beginTime, long endTime, String filename) {
-        System.out.print("Meta: " + fiberId + "-" + beginTime + "-" + endTime + "-" + filename);
+        dbConnection.commitMetaRecord(fiberId, filename, new Timestamp(beginTime), new Timestamp(endTime));
+        System.out.println("Meta: " + fiberId + "-" + beginTime + "-" + endTime + "-" + filename);
     }
 
     public String getName() {
@@ -122,7 +134,7 @@ public class SimpleWriterThread extends WriterThread {
 
     @Override
     public boolean readyToStop() {
-        return isReadyToStop.get();
+        return isReadyToStop.get() && queue.isEmpty();
     }
 
     public String toString() {

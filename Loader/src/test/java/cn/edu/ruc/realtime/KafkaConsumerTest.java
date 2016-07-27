@@ -27,7 +27,7 @@ public class KafkaConsumerTest {
         props.put("value.deserializer", "cn.edu.ruc.realtime.utils.MessageDer");
 //        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         KafkaConsumer<Long, Message> consumer = new KafkaConsumer<>(props);
-        TopicPartition topicPartition = new TopicPartition("07221918", 0);
+        TopicPartition topicPartition = new TopicPartition("07261212", 2);
         consumer.assign(Arrays.asList(topicPartition));
         consumer.seekToBeginning(topicPartition);
 
@@ -37,7 +37,7 @@ public class KafkaConsumerTest {
 
             for (ConsumerRecord<Long, Message> record: records) {
                 counter++;
-                System.out.println(record.key() + ": " + record.value().getValue());
+//                System.out.println(record.key() + ": " + record.value().getValue());
             }
 //            for (ConsumerRecord<Long, Message> record : records) {
 //                counter++;

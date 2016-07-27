@@ -42,11 +42,6 @@ public class ThreadManager {
     }
 
     public void execute() {
-        for (int i = 0; i < partitionNum; i++) {
-            LoaderThread loader = new SimpleLoaderThread(topic, i, queue);
-            loaderMap.add(loader);
-            executor.execute(loader);
-        }
         for (int i = 0; i < writerThreadNum; i++) {
             System.out.println();
             SimpleWriterThread writer = new SimpleWriterThread("Writer-" + topic + "-" + i, queue);
@@ -54,8 +49,13 @@ public class ThreadManager {
             writerMap.add(writer);
             executor.execute(writer);
         }
-    }
 
+        for (int i = 0; i < partitionNum; i++) {
+            LoaderThread loader = new SimpleLoaderThread(topic, i, queue);
+            loaderMap.add(loader);
+            executor.execute(loader);
+        }
+    }
 
     public void shutdownAll() {
         shutdownLoader();
