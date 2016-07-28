@@ -29,6 +29,11 @@ public class HadoopWriter implements Writer {
     private Configuration conf = new Configuration();
     private FSDataOutputStream outputStream;
 
+    public HadoopWriter() {
+        conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+        conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+    }
+
     @Override
     public synchronized String write(Set<Integer> ids, List<Message> messages, long beginTime, long endTime) {
         StringBuilder sb = new StringBuilder();

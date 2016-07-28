@@ -41,8 +41,8 @@ public class SimpleWriterThread extends WriterThread {
         Block block = new Block();
         //TODO Add time limit
         systemLogger.info(getName() + ": started");
-        writer = new FileWriter();
-//        writer = new HadoopWriter();
+//        writer = new FileWriter();
+        writer = new HadoopWriter();
         while (true) {
             if (readyToStop()) {
                 writerBlock(block);
