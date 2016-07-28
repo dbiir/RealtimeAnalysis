@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 public class ThreadManager {
     private static int threadNum = Runtime.getRuntime().availableProcessors() * 2;
     private int partitionNum;
+    private List<Integer> partitionIds;
     private String topic;
     private ExecutorService executor;
 
@@ -35,9 +36,10 @@ public class ThreadManager {
     private final List<WriterThread> writerMap = new LinkedList<>();
     private final BlockingQueue<Batch> queue = new ArrayBlockingQueue(blockingQueueSize);
 
-    public ThreadManager(String topic, int partitionNum) {
+    public ThreadManager(String topic, List<Integer> partitionIds) {
         this.topic = topic;
-        this.partitionNum = partitionNum;
+        this.partitionIds = partitionIds;
+        partitionNum = partitionIds.size();
         executor = Executors.newFixedThreadPool(threadNum);
     }
 
@@ -51,7 +53,7 @@ public class ThreadManager {
         }
 
         for (int i = 0; i < partitionNum; i++) {
-            LoaderThread loader = new SimpleLoaderThread(topic, i, queue);
+            LoaderThread loader = new SimpleLoaderThread(topic, partitionIds.get(i), queue);
             loaderMap.add(loader);
             executor.execute(loader);
         }
