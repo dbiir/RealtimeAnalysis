@@ -2,6 +2,9 @@ package cn.edu.ruc.realtime.threads;
 
 import cn.edu.ruc.realtime.utils.ConfigFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Jelly on 6/29/16.
  */
@@ -18,7 +21,10 @@ public class LoaderManagerTest {
         // load config
         ConfigFactory configFactory = ConfigFactory.getInstance(args[0]);
 
-        ThreadManager manager = new ThreadManager("test07051224", 10);
+        List<Integer> ids = new ArrayList<>();
+        ids.add(10);
+
+        ThreadManager manager = new ThreadManager("test07051224", ids);
         manager.execute();
 
         System.out.println("Loading...");
