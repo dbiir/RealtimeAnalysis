@@ -1,11 +1,10 @@
 .DS_Store
 .idea/
 META-INF/
-pom.xml
 *.javac
 *.class
-*.jar
 *.iml
 *.log
 resources/
 result
+out/
