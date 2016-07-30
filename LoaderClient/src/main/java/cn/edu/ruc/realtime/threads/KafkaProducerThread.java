@@ -54,6 +54,8 @@ public class KafkaProducerThread extends ProducerThread {
         long before = System.currentTimeMillis();
         while (true){
             if (readyToStop()) {
+                System.out.println(getThreadName() + " quit.");
+                systemLogger.info(getThreadName() + " quit.");
                 producer.close();
                 break;
             }

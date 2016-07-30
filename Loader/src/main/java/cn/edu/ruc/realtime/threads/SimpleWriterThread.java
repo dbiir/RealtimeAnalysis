@@ -6,6 +6,7 @@ import cn.edu.ruc.realtime.model.Meta;
 import cn.edu.ruc.realtime.utils.*;
 import cn.edu.ruc.realtime.writer.FileWriter;
 import cn.edu.ruc.realtime.writer.HadoopWriter;
+import cn.edu.ruc.realtime.writer.ParquetHadoopWriter;
 import cn.edu.ruc.realtime.writer.Writer;
 
 import java.sql.Timestamp;
@@ -42,7 +43,8 @@ public class SimpleWriterThread extends WriterThread {
         //TODO Add time limit
         systemLogger.info(getName() + ": started");
 //        writer = new FileWriter();
-        writer = new HadoopWriter();
+//        writer = new HadoopWriter();
+        writer = new ParquetHadoopWriter();
         while (true) {
             if (readyToStop()) {
                 writerBlock(block);
@@ -55,8 +57,8 @@ public class SimpleWriterThread extends WriterThread {
                 }
                 Batch msgBatch = queue.take();
                 counter.getAndIncrement();
-                systemLogger.info("SimpleWriterThread add batch");
-                systemLogger.info("Writer thread, block counter: " + counter.get());
+//                systemLogger.info("SimpleWriterThread add batch");
+//                systemLogger.info("Writer thread, block counter: " + counter.get());
                 block.addBatch(msgBatch);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -67,10 +69,13 @@ public class SimpleWriterThread extends WriterThread {
     public void writerBlock(Block block) {
         block.construct();
         // write to file
+        long before = System.currentTimeMillis();
         String filename = writer.write(block.getFiberId(),
                 block.getContent(),
                 block.getBlockMinTimestamp(),
                 block.getBlockMaxTimestamp());
+        long end = System.currentTimeMillis();
+        systemLogger.info("Write cost: " + (end - before) + " ms");
         // write succeeds, commit meta
         if (filename != null) {
             for (Meta meta: block.getMetas()) {
@@ -81,8 +86,9 @@ public class SimpleWriterThread extends WriterThread {
             }
 //                        commitOffset(writerQueue);
             // clear block content
-            systemLogger.info("Write success, clear block");
             block.clear();
+            long allEnd = System.currentTimeMillis();
+            systemLogger.info("Commit meta cost: " + (allEnd - end) + " ms");
         } else {
             // TODO file write failed
         }
@@ -110,8 +116,6 @@ public class SimpleWriterThread extends WriterThread {
                 commitMap.put(key, value);
             }
         }
-        // commit offsets of whole block to storage
-//        dbConnection.commitPartitionOffsets(commitMap);
     }
 
     /**
@@ -120,7 +124,7 @@ public class SimpleWriterThread extends WriterThread {
      * */
     public void commitMeta(int fiberId, long beginTime, long endTime, String filename) {
         dbConnection.commitMetaRecord(fiberId, filename, new Timestamp(beginTime), new Timestamp(endTime));
-        System.out.println("Meta: " + fiberId + "-" + beginTime + "-" + endTime + "-" + filename);
+//        System.out.println("Meta: " + fiberId + "-" + beginTime + "-" + endTime + "-" + filename);
     }
 
     public String getName() {

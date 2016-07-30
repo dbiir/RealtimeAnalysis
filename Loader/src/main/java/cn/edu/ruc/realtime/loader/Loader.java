@@ -9,15 +9,15 @@ import java.util.List;
  */
 public class Loader {
     private String topic;
-    private List<Integer> paritionIds;
+    private List<Integer> partitionIds;
 
     public Loader(String topic, List<Integer> partitionIds) {
         this.topic = topic;
-        this.paritionIds = partitionIds;
+        this.partitionIds = partitionIds;
     }
 
     public void load() {
-        ThreadManager manager = new ThreadManager(topic, paritionIds);
+        ThreadManager manager = new ThreadManager(topic, partitionIds);
         manager.execute();
     }
 }

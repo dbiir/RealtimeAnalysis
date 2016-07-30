@@ -82,7 +82,7 @@ public class PostgresConnection extends DBConnection {
                 .append("','")
                 .append(endTime)
                 .append("');");
-        System.out.println(sb.toString());
+//        System.out.println(sb.toString());
         execUpdate(sb.toString());
     }
 

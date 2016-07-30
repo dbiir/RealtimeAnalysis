@@ -1,19 +1,27 @@
 package cn.edu.ruc.realtime.threads;
 
 import cn.edu.ruc.realtime.model.Message;
+import cn.edu.ruc.realtime.utils.Log;
+import cn.edu.ruc.realtime.utils.LogFactory;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 /**
  * @author Jelly
+ *
+ * Simple Producer.
+ * Get data from blocking queue, and count
+ * Just for test
  */
 public class SimpleProducerThread extends ProducerThread {
     private String threadName;
     private BlockingQueue<Message> blockingQueue;
     private AtomicLong msgCounter = new AtomicLong(0L);
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
+    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
 
     public SimpleProducerThread(String threadName, BlockingQueue<Message> blockingQueue) {
         this.threadName = threadName;
@@ -30,6 +38,8 @@ public class SimpleProducerThread extends ProducerThread {
         long before = System.currentTimeMillis();
         while (true){
             if (readyToStop() && blockingQueue.isEmpty()) {
+                System.out.println(getThreadName() + " quit.");
+                systemLogger.info(getThreadName() + " quit");
                 break;
             }
             try {

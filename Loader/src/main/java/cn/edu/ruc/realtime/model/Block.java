@@ -1,6 +1,8 @@
 package cn.edu.ruc.realtime.model;
 
 import cn.edu.ruc.realtime.utils.ConfigFactory;
+import cn.edu.ruc.realtime.utils.Log;
+import cn.edu.ruc.realtime.utils.LogFactory;
 
 import java.util.*;
 
@@ -15,6 +17,7 @@ import java.util.*;
 public class Block {
 
     private ConfigFactory configFactory = ConfigFactory.getInstance();
+    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
     private int capacity = configFactory.getWriterBlockSize();
     // partition -> List<Batch>
     private HashMap<Integer, List<Batch>> bufferMap = new HashMap<>();
@@ -31,6 +34,7 @@ public class Block {
 
     // sort messages in batchs, and put into content, fill in metas
     public void construct() {
+        long before = System.currentTimeMillis();
         // put messages into content
         List<Message> partitionContent = new LinkedList<>();
         for (int key: bufferMap.keySet()) {
@@ -71,6 +75,9 @@ public class Block {
         }
         blockMinTimestamp = getMinTimestamp();
         blockMaxTimestamp = getMaxTimestamp();
+        long end = System.currentTimeMillis();
+        System.out.println("Construction cost: " + (end - before) + " ms");
+        systemLogger.info("Construction cost: " + (end - before) + " ms");
     }
 
     public int msgCompare(Message m1, Message m2) {

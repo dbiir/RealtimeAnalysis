@@ -71,8 +71,8 @@ public class SimpleLoaderThread extends LoaderThread {
         consumer.assign(Arrays.asList(topicPartition));
         // TODO seek to the beginning, just for test, should consult the meta server.
         consumer.seekToBeginning(topicPartition);
-        int msgCounter = 0;
-        int batchCounter = 0;
+//        int msgCounter = 0;
+//        int batchCounter = 0;
 
         while (true){
             if (readyToStop()) {
@@ -88,22 +88,22 @@ public class SimpleLoaderThread extends LoaderThread {
             ConsumerRecords<Long, Message> records = consumer.poll(1000);
             for (ConsumerRecord<Long, Message> record: records) {
 //                counter.getAndIncrement();
-                msgCounter++;
+//                msgCounter++;
                 try {
                     if (localBatch.get().isFull()) {
                         queue.put(localBatch.get());
-                        System.out.println(queue.size());
+//                        System.out.println(queue.size());
                         localBatch.set(new Batch(batchSize, partition));
 //                        batchCounter.getAndIncrement();
-                        batchCounter++;
+//                        batchCounter++;
                     }
                     localBatch.get().addMsg(record.value(), record.offset());
                 } catch (Exception e) {
                     systemLogger.exception(e);
                 }
             }
-            systemLogger.info("Partition: " + getPartition() + ", message counter: " + msgCounter);
-            systemLogger.info("Partition: " + getPartition() + ", batch counter: " + batchCounter);
+//            systemLogger.info("Partition: " + getPartition() + ", message counter: " + msgCounter);
+//            systemLogger.info("Partition: " + getPartition() + ", batch counter: " + batchCounter);
         }
     }
 

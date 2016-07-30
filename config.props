@@ -16,7 +16,7 @@ partitioner.class=cn.edu.ruc.realtime.partition.LoaderClientPartitionKafka
 
 ## LoaderClient ThreadPool
 thread.pool.size=40
-thread.queue.size=2000
+thread.queue.size=6000
 producer.thread.num=4
 
 # Loader
@@ -36,7 +36,7 @@ blocking.queue.size=100
 ## WriterThread
 writer.block.size=10
 writer.full.factor=0.98
-writer.file.path=/Users/Jelly/Developer/RealTimeAnalysis/result/
+writer.file.path=/Users/Jelly/Developer/RealTimeAnalysis/parquet/
 writer.thread.num=1
 
 # Meta

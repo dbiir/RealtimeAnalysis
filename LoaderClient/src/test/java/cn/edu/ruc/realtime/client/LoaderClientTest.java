@@ -40,7 +40,7 @@ public class LoaderClientTest {
 
         System.out.println("Start reading from file...");
         while ((line = reader.readLine()) != null) {
-            String key = line.split("|")[0];
+            String key = line.split("\\|")[0];
             Message message = new Message(Long.valueOf(key), line);
             message.setTimestamp(System.currentTimeMillis());
             messageList.add(message);
