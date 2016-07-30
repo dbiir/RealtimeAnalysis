@@ -34,9 +34,9 @@ public class ProducerThreadPool {
         // if customized thread pool size is larger, set to customized one, else stick to default
         if (config.getThreadPoolSize() > threadPoolSize)
             threadPoolSize = config.getThreadPoolSize();
-        // if customized thread queue size is specified, set to customized one, else stick to default
-        if (config.getThreadQueueSize() != 0)
-            queueSize = config.getThreadQueueSize();
+        // if customized blocking queue size is specified, set to customized one, else stick to default
+        if (config.getBlockingQueueSize() != 0)
+            queueSize = config.getBlockingQueueSize();
         executor = Executors.newFixedThreadPool(threadPoolSize);
         this.topic = topic;
         queue = new ArrayBlockingQueue(queueSize);

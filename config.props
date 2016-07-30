@@ -15,8 +15,7 @@ value.serializer=cn.edu.ruc.realtime.utils.MessageSer
 partitioner.class=cn.edu.ruc.realtime.partition.LoaderClientPartitionKafka
 
 ## LoaderClient ThreadPool
-thread.pool.size=40
-thread.queue.size=6000
+blocking.pool.size=40
 producer.thread.num=4
 
 # Loader
@@ -30,8 +29,8 @@ consumer.key.deserializer=org.apache.kafka.common.serialization.LongDeserializer
 consumer.value.deserializer=cn.edu.ruc.realtime.utils.MessageDer
 writer.batch.size=1000
 
-## Blocking Queue
-blocking.queue.size=100
+## Loader thread blocking Queue
+thread.queue.size=100
 
 ## WriterThread
 writer.block.size=10

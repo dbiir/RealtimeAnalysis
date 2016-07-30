@@ -29,7 +29,7 @@ public class ThreadManager {
     private ExecutorService executor;
 
     private ConfigFactory configFactory = ConfigFactory.getInstance();
-    private int blockingQueueSize = configFactory.getBlockingQueueSize();
+    private int blockingQueueSize = configFactory.getThreadQueueSize();
     private int writerThreadNum = configFactory.getWriterThreadNum();
 
     private final List<LoaderThread> loaderMap = new LinkedList<>();
