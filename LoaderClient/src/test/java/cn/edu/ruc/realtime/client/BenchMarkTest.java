@@ -110,13 +110,12 @@ public class BenchMarkTest {
 
                 if ((test - Start) % 10000 == 0) {
                     System.out.println(test - Start);
-                    System.out.println("Speed " + total * 1.0 * 275 / 1024 / (test - Start));
+                    System.out.println("Speed " + total * 1.0 * length / 1024 / (test - Start));
                 }
-
             }
         }
         long End=System.currentTimeMillis();
-        System.out.println("Total speed "+total*275.0/1024/(End-Start) + ". Cost: " + (End-Start) + " ms.");
+        System.out.println("Total speed "+total*length/1024/(End-Start) + ". Cost: " + (End-Start) + " ms.");
         br.close();
     }
 }

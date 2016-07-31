@@ -13,16 +13,18 @@ import java.util.List;
 public class LoaderTest {
 
     public static void main(String[] args) {
-        if (args.length < 3) {
-            System.out.println("Usage: java -jar Loader propertiesFilePath topic partitionId partitionId ...");
+        if (args.length != 4) {
+            System.out.println("Usage: java -jar Loader propertiesFilePath topic partitionIdBegin partitionIdEnd");
             System.exit(1);
         }
 
         String props = args[0];
         String topic = args[1];
+        int partitionB = Integer.parseInt(args[2]);
+        int partitionE = Integer.parseInt(args[3]);
         List<Integer> partitionIds = new ArrayList<>();
-        for (int i = 2; i < args.length; i++) {
-            partitionIds.add(Integer.parseInt(args[i]));
+        for (int i = partitionB; i <= partitionE; i++) {
+            partitionIds.add(i);
         }
 
         ConfigFactory configFactory = ConfigFactory.getInstance(props);

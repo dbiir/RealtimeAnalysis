@@ -22,5 +22,10 @@
             <artifactId>LoaderClient</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.11</artifactId>
+            <version>2.0.0</version>
+        </dependency>
     </dependencies>
 </project>

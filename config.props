@@ -26,6 +26,7 @@ consumer.auto.commit.interval.ms=1000
 consumer.session.timeout=30000
 consumer.key.deserializer=org.apache.kafka.common.serialization.LongDeserializer
 consumer.value.deserializer=cn.edu.ruc.realtime.utils.MessageDer
+
 writer.batch.size=10000
 
 ## Loader thread blocking Queue

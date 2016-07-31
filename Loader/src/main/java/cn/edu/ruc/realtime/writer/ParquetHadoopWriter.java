@@ -43,19 +43,19 @@ public class ParquetHadoopWriter implements Writer {
             "required float extendedprice; " +
             "required float discount; " +
             "required float tax; " +
-            "required fixed_len_byte_array(1) returnflag; " +
-            "required fixed_len_byte_array(1) linestatus; " +
+            "required byte_array returnflag; " +
+            "required byte_array linestatus; " +
             "required binary shipdate; " +
             "required binary commitdate; " +
             "required binary receiptdate; " +
-            "required fixed_len_byte_array(25) shipinstruct; " +
-            "required fixed_len_byte_array(10) shipmode; " +
+            "required byte_array shipinstruct; " +
+            "required byte_array shipmode; " +
             "required binary comment; " +
-            "required fixed_len_byte_array(1) orderstatus; " +
+            "required byte_array orderstatus; " +
             "required float totalprice; " +
             "required binary orderdate; " +
-            "required fixed_len_byte_array(15) orderpriority; " +
-            "required fixed_len_byte_array(15) clerk; " +
+            "required byte_array orderpriority; " +
+            "required byte_array clerk; " +
             "required int32 shippriority; " +
             "required binary ordercomment; " +
             "required int64 messagedate; " +
@@ -87,6 +87,9 @@ public class ParquetHadoopWriter implements Writer {
             for (Message msg : messages) {
 //                System.out.println(msg.getValue());
                 String[] recordS = msg.getValue().split("\\|");
+                if (recordS.length < 25) {
+                    continue;
+                }
                 parquetWriter.write(
                         simpleGroupFactory.newGroup()
                                 .append("custkey", Integer.parseInt(recordS[0]))
