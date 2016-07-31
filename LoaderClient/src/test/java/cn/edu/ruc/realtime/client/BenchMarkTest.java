@@ -22,8 +22,8 @@ public class BenchMarkTest {
 
     public static void main(String[] args) {
 
-        if (args.length != 5) {
-            System.out.println("Usage: java -jar loaderClient propertiesFilePath input topic speed length");
+        if (args.length != 6) {
+            System.out.println("Usage: java -jar loaderClient propertiesFilePath input topic speed length factor");
             System.exit(1);
         }
 
@@ -33,19 +33,20 @@ public class BenchMarkTest {
         String topic = args[2];
         String speed = args[3];
         String length = args[4];
+        String factor = args[5];
 
         ConfigFactory config = ConfigFactory.getInstance(props);
         LoaderClient client = new LoaderClient(topic);
 
         try {
-            contralSpeed(client, input, Integer.parseInt(speed), Integer.parseInt(length));
+            contralSpeed(client, input, Integer.parseInt(speed), Integer.parseInt(length), Integer.parseInt(factor));
             client.shutdown();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void contralSpeed(LoaderClient client, String fileName, double speed,int length)throws IOException {
+    public static void contralSpeed(LoaderClient client, String fileName, double speed,int length, int factor)throws IOException {
         List<Message> nodelist = new LinkedList<Message>();
 
         BufferedReader br = new BufferedReader(
@@ -75,45 +76,47 @@ public class BenchMarkTest {
         int total=0;
 
         long Start=System.currentTimeMillis();
-        for (Message node : nodelist) {
+        while (factor-- > 0) {
+            for (Message node : nodelist) {
 
-            if(num==0&&mark==1){
-                long js=System.currentTimeMillis();
-                long Stop=f-(js-start);
+                if (num == 0 && mark == 1) {
+                    long js = System.currentTimeMillis();
+                    long Stop = f - (js - start);
 
-                if(Stop>0){
-                    try {
-                        Thread.sleep(Stop);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if (Stop > 0) {
+                        try {
+                            Thread.sleep(Stop);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
+                    mark = 0;
                 }
-                mark=0;
+                if (num == 0 && mark == 0) {
+                    start = System.currentTimeMillis();
+                    mark = 1;
+                    num = block;
+                }
+
+                // add timestamp; sent message
+                long test = System.currentTimeMillis();
+                String withTimestamp = node.getValue() + "|" + String.valueOf(test);
+                Message msg = new Message(node.getKey(), withTimestamp);
+                msg.setTimestamp(test);
+                client.sendMessage(msg);
+
+                num--;
+                total++;
+
+                if ((test - Start) % 10000 == 0) {
+                    System.out.println(test - Start);
+                    System.out.println("Speed " + total * 1.0 * 275 / 1024 / (test - Start));
+                }
+
             }
-            if(num==0&&mark==0){
-                start=System.currentTimeMillis();
-                mark=1;
-                num=block;
-            }
-
-            // add timestamp; sent message
-            long test=System.currentTimeMillis();
-            String withTimestamp = node.getValue() + "|" + String.valueOf(test);
-            Message msg = new Message(node.getKey(), withTimestamp);
-            msg.setTimestamp(test);
-            client.sendMessage(msg);
-
-            num--;
-            total++;
-
-            if( (test-Start)%10000==0){
-                System.out.println(test-Start);
-                System.out.println("Speed "+total*1.0*275/1024/(test-Start));
-            }
-
         }
         long End=System.currentTimeMillis();
-        System.out.println("Total speed "+total*275.0/1024/(End-Start));
+        System.out.println("Total speed "+total*275.0/1024/(End-Start) + ". Cost: " + (End-Start) + " ms.");
         br.close();
     }
 }
