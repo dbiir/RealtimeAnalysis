@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class BenchMarkTest {
 
         long start=0;
         int num=0,mark=0;
-        int total=0;
+        long total=0;
 
         long Start=System.currentTimeMillis();
         while (factor-- > 0) {
@@ -100,7 +101,7 @@ public class BenchMarkTest {
 
                 // add timestamp; sent message
                 long test = System.currentTimeMillis();
-                String withTimestamp = node.getValue() + "|" + String.valueOf(test);
+                String withTimestamp = node.getValue() + "|" + new Timestamp(test);
                 Message msg = new Message(node.getKey(), withTimestamp);
                 msg.setTimestamp(test);
                 client.sendMessage(msg);
@@ -115,7 +116,7 @@ public class BenchMarkTest {
             }
         }
         long End=System.currentTimeMillis();
-        System.out.println("Total speed "+total*length/1024/(End-Start) + ". Cost: " + (End-Start) + " ms.");
+        System.out.println("Total speed " + total*length*1000/1024/1024/(End-Start) + "MB/S. Cost: " + (End-Start) + " ms.");
         br.close();
     }
 }

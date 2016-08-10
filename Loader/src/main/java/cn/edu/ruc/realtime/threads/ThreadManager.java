@@ -3,6 +3,8 @@ package cn.edu.ruc.realtime.threads;
 import cn.edu.ruc.realtime.model.Batch;
 import cn.edu.ruc.realtime.model.Message;
 import cn.edu.ruc.realtime.utils.ConfigFactory;
+import cn.edu.ruc.realtime.utils.Log;
+import cn.edu.ruc.realtime.utils.LogFactory;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -29,6 +31,7 @@ public class ThreadManager {
     private ExecutorService executor;
 
     private ConfigFactory configFactory = ConfigFactory.getInstance();
+    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
     private int blockingQueueSize = configFactory.getThreadQueueSize();
     private int writerThreadNum = configFactory.getWriterThreadNum();
 
@@ -53,6 +56,7 @@ public class ThreadManager {
         }
 
         for (int i = 0; i < partitionNum; i++) {
+            systemLogger.info("Loader Thread Partition: " + i + " started.");
             LoaderThread loader = new SimpleLoaderThread(topic, partitionIds.get(i), queue);
             loaderMap.add(loader);
             executor.execute(loader);

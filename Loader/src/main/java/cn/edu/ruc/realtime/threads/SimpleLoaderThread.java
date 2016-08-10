@@ -85,7 +85,7 @@ public class SimpleLoaderThread extends LoaderThread {
                 }
                 break;
             }
-            ConsumerRecords<Long, Message> records = consumer.poll(1000);
+            ConsumerRecords<Long, Message> records = consumer.poll(Long.MAX_VALUE);
             for (ConsumerRecord<Long, Message> record: records) {
 //                counter.getAndIncrement();
 //                msgCounter++;

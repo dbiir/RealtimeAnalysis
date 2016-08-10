@@ -416,4 +416,22 @@ public class ConfigFactory {
         }
         return 1;
     }
+
+    public String getTestMetaSQL() {
+        try {
+            return getProps("test.meta.sql");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return null;
+    }
+
+    public String getTestQuerySQL() {
+        try {
+            return getProps("test.query.sql");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return null;
+    }
 }

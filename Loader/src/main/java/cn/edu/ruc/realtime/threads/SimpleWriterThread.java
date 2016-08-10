@@ -52,7 +52,7 @@ public class SimpleWriterThread extends WriterThread {
             }
             try {
                 if (block.isFull()){
-                    systemLogger.info(getName() + ": Ready to write");
+                    systemLogger.info(getName() + "Current time: " + System.currentTimeMillis() + ". Ready to write");
                     writerBlock(block);
                 }
                 Batch msgBatch = queue.take();
@@ -75,7 +75,7 @@ public class SimpleWriterThread extends WriterThread {
                 block.getBlockMinTimestamp(),
                 block.getBlockMaxTimestamp());
         long end = System.currentTimeMillis();
-        systemLogger.info("Write cost: " + (end - before) + " ms");
+        systemLogger.info("Current time: " + System.currentTimeMillis() + "Write cost: " + (end - before) + " ms");
         // write succeeds, commit meta
         if (filename != null) {
             for (Meta meta: block.getMetas()) {
@@ -88,7 +88,8 @@ public class SimpleWriterThread extends WriterThread {
             // clear block content
             block.clear();
             long allEnd = System.currentTimeMillis();
-            systemLogger.info("Commit meta cost: " + (allEnd - end) + " ms");
+            systemLogger.info("Current time: " + System.currentTimeMillis() + "Commit meta cost: " + (allEnd - end) + " ms");
+            System.out.println("Done block");
         } else {
             // TODO file write failed
         }

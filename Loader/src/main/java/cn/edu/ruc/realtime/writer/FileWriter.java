@@ -43,7 +43,7 @@ public class FileWriter implements Writer {
             }
         }
         try {
-            System.out.println("Flush and shutdown");
+            System.out.println("Flush file");
             writer.flush();
             return sb.toString();
         } catch (IOException e) {

@@ -68,7 +68,7 @@ public class KafkaProducerThread extends ProducerThread {
             }
         }
         long end = System.currentTimeMillis();
-        System.out.println("Sending " + msgCounter.get() + " messages. Done: " + end + " ms");
+        System.out.println("Sending " + msgCounter.get() + " messages. Done: " + (end - before) + " ms");
     }
 
     public String getThreadName() {

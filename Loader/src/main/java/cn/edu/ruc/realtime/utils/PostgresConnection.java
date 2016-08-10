@@ -33,7 +33,7 @@ public class PostgresConnection extends DBConnection {
         }
     }
 
-    private ResultSet execQuery(String query) {
+    public ResultSet execQuery(String query) {
         Statement statement;
         try {
             statement = conn.createStatement();
@@ -73,7 +73,7 @@ public class PostgresConnection extends DBConnection {
      * */
     public void commitMetaRecord(int partition, String file, Timestamp beginTime, Timestamp endTime) {
         StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO metatable VALUES(")
+        sb.append("INSERT INTO parquet VALUES(")
                 .append(partition)
                 .append(",'")
                 .append(file)

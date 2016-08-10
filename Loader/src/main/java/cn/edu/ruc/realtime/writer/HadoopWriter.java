@@ -51,7 +51,7 @@ public class HadoopWriter implements Writer {
             FileSystem fileSystem = FileSystem.get(new URI("hdfs://192.168.7.33:9000"), conf);
             outputStream = fileSystem.create(new Path(sb.toString()));
             for (Message msg : messages) {
-                outputStream.writeBytes(msg.getStringKey() + "-" + msg.getTimestamp() + ": " + msg.getValue() + "\n");
+                outputStream.writeBytes(msg.getValue() + "\n");
             }
             outputStream.flush();
             System.out.println("Flush file");

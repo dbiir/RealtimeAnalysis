@@ -76,8 +76,8 @@ public class Block {
         blockMinTimestamp = getMinTimestamp();
         blockMaxTimestamp = getMaxTimestamp();
         long end = System.currentTimeMillis();
-        System.out.println("Construction cost: " + (end - before) + " ms");
-        systemLogger.info("Construction cost: " + (end - before) + " ms");
+//        System.out.println("Construction cost: " + (end - before) + " ms");
+//        systemLogger.info("Construction cost: " + (end - before) + " ms");
     }
 
     public int msgCompare(Message m1, Message m2) {

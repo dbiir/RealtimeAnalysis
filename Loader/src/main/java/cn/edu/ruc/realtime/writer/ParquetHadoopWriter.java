@@ -43,22 +43,22 @@ public class ParquetHadoopWriter implements Writer {
             "required float extendedprice; " +
             "required float discount; " +
             "required float tax; " +
-            "required byte_array returnflag; " +
-            "required byte_array linestatus; " +
+            "required binary returnflag; " +
+            "required binary linestatus; " +
             "required binary shipdate; " +
             "required binary commitdate; " +
             "required binary receiptdate; " +
-            "required byte_array shipinstruct; " +
-            "required byte_array shipmode; " +
+            "required binary shipinstruct; " +
+            "required binary shipmode; " +
             "required binary comment; " +
-            "required byte_array orderstatus; " +
+            "required binary orderstatus; " +
             "required float totalprice; " +
             "required binary orderdate; " +
-            "required byte_array orderpriority; " +
-            "required byte_array clerk; " +
+            "required binary orderpriority; " +
+            "required binary clerk; " +
             "required int32 shippriority; " +
             "required binary ordercomment; " +
-            "required int64 messagedate; " +
+            "required binary messagedate; " +
             "}");
     private GroupWriteSupport groupWriteSupport = new GroupWriteSupport();
     private SimpleGroupFactory simpleGroupFactory = new SimpleGroupFactory(schema);
@@ -116,7 +116,7 @@ public class ParquetHadoopWriter implements Writer {
                                 .append("clerk", recordS[21])
                                 .append("shippriority", Integer.parseInt(recordS[22]))
                                 .append("ordercomment", recordS[23])
-                                .append("messagedate", Long.parseLong(recordS[24]))
+                                .append("messagedate", recordS[24])
                 );
             }
             parquetWriter.close();
