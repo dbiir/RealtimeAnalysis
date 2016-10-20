@@ -1,0 +1,36 @@
+====================================================== Time-fiber based selection rate ================================================
+time range: 2016-08-10 10:14:37.105 | 2016-08-10 11:48:36.088    approx:100min
+======================== Parquet ========================
+MetaSQL: 
+1%:  SELECT count(DISTINCT file) FROM queryParquet WHERE begintime < '2016-08-10 10:15:37';   [15 blocks]
+2%:  SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:16:37';   [15 blocks]
+3%:  SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:17:37';   [15 blocks]
+4%:  SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:18:37';   [54 blocks]
+5%:  SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:19:37';   [60 blocks]
+10%: SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:24:37';   [88 blocks]
+
+1%:  SELECT count(DISTINCT file) FROM queryParquet WHERE begintime < '2016-08-10 10:15:37' and partition=10;   [1 blocks]
+2%:  SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:16:37' and partition=10;   [1 blocks]
+3%:  SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:17:37' and partition=10;   [1 blocks]
+4%:  SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:18:37' and partition=10;   [2 blocks]
+5%:  SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:19:37' and partition=10;   [4 blocks]
+10%: SELECT count(DISTINCT file) FROM queryParquet WHERE beginTime < '2016-08-10 10:24:37' and partition=10;   [11 blocks]
+
+QeurySQL:
+SELECT sum(quantity) AS sum_qty, sum(extendedprice) AS sum_base_price, avg(quantity) AS avg_qty, avg(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime where messagedate < '2016-08-10 10:16' [and custkey = 1348000]
+
+======================== Text ========================
+2016-08-10 10:14:37.105 | 2016-08-10 11:20:09.34   approx:66min
+1%:  SELECT count(DISTINCT file) FROM querytext WHERE begintime < '2016-08-10 10:15:37';   [15 blocks]
+2%:  SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:16:37';   [15 blocks]
+3%:  SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:17:37';   [15 blocks]
+4%:  SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:18:03';   [49 blocks]
+5%:  SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:18:04';   [62 blocks]
+10%: SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:18:37';   [85 blocks]
+
+1%:  SELECT count(DISTINCT file) FROM querytext WHERE begintime < '2016-08-10 10:15:37' and partition=10;   [1 blocks]
+2%:  SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:16:37' and partition=10;   [1 blocks]
+3%:  SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:17:37' and partition=10;   [1 blocks]
+4%:  SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:18:03' and partition=10;   [2 blocks]
+5%:  SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:19:00' and partition=10;   [5 blocks]
+10%: SELECT count(DISTINCT file) FROM querytext WHERE beginTime < '2016-08-10 10:21:00' and partition=10;   [10 blocks]
