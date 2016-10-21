@@ -38,12 +38,25 @@
       <section id="main_content" class="inner">
 
         <h1>Getting Started</h1>
-        <p></p>
+        <h3>Cluster Setup</h3>
+        <p>Hadoop: v2.6.3</p>
+        <p>Kafka: v0.9.0.1</p>
+        <p>Presto: v0.147</p>
+        <p>Hive: v2.1.0</p>
+        <h3>Quick Start</h3>
+        <p>Download releases, and unzip. Copy the folder to destined cluster, 
+        and specify hostname of machines running Loader in loaders file, then 
+        run ./sbin/deploy.sh, which will distribute needed files to all loader 
+        machines.</p>
+        <p>Run ./sbin/start-loaders.sh, and all loaders will start in background. 
+        Check running file will see running logs.</p>
+        <p>Run ./sbin/loaderClient-daemon.sh $basefile $topic $speed $recordlen $sf</p>
 
         <h1>Architecture</h1>
         <p></p>
 
         <h1>Documentation</h1>
+        <h3>Configuration</h3>
         <p></p>
 
         <h1>Performance</h1>
