@@ -8,6 +8,7 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * RealTimeAnalysis
+ * Print result to console. Just for TEST
  *
  * @author Jelly
  */
@@ -51,7 +52,7 @@ public class ConsoleWriterThread extends WriterThread {
                 iterator = batch.getIterator();
                 while (iterator.hasNext()) {
                     msg = iterator.next();
-//                    System.out.println(msg.toString());
+                    System.out.println(msg.toString());
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

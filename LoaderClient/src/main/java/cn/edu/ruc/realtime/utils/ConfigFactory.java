@@ -384,6 +384,15 @@ public class ConfigFactory {
         return "org.postgresql.Driver";
     }
 
+    public String getMetaTableName() {
+        try {
+            return getProps("db.connection.table");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "meta_table";
+    }
+
     public int getBlockingQueueSize() {
         try {
             return Integer.parseInt(getProps("blocking.queue.size"));
@@ -409,6 +418,37 @@ public class ConfigFactory {
     public int getProducerThreadNum() {
         try {
             return Integer.parseInt(getProps("producer.thread.num"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 1;
+    }
+
+    public String getLoaderTopic() {
+        try {
+            return getProps("loader.topic");
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        }
+        return "test";
+    }
+
+    public int getLoaderPartitionBegin() {
+        try {
+            return Integer.parseInt(getProps("loader.partition.begin"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 0;
+    }
+
+    public int getLoaderPartitionEnd() {
+        try {
+            return Integer.parseInt(getProps("loader.partition.end"));
         } catch (PropertyNotExistException pe) {
             systemLogger.exception(pe);
         } catch (NumberFormatException ne) {

@@ -14,6 +14,7 @@ public class PostgresConnection extends DBConnection {
     private String user = configFactory.getDBConnectionUser();
     private String pass = configFactory.getDBConnectionPwd();
     private String driverClass = configFactory.getDBConnectionDriverClass();
+    private String tableN = configFactory.getMetaTableName();
     private static Connection conn;
 
     public PostgresConnection() {
@@ -73,7 +74,9 @@ public class PostgresConnection extends DBConnection {
      * */
     public void commitMetaRecord(int partition, String file, Timestamp beginTime, Timestamp endTime) {
         StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO parquet VALUES(")
+        sb.append("INSERT INTO ")
+                .append(tableN)
+                .append(" VALUES(")
                 .append(partition)
                 .append(",'")
                 .append(file)
@@ -82,7 +85,6 @@ public class PostgresConnection extends DBConnection {
                 .append("','")
                 .append(endTime)
                 .append("');");
-//        System.out.println(sb.toString());
         execUpdate(sb.toString());
     }
 

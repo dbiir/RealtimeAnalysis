@@ -11,3 +11,4 @@ out/
 parquet/
 plain/
 local/
+META-INF/

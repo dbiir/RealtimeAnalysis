@@ -25,7 +25,6 @@ public class ParquetHadoopWriter implements Writer {
     private Configuration conf = new Configuration();
     private ConfigFactory configFactory = ConfigFactory.getInstance();
     private final String basePath = configFactory.getWriterFilePath();
-//    private final String basePath = "file:///Users/Jelly/Developer/RealTimeAnalysis/parquet/";
     private int blockSize = 256 * 1024 * 1024;
     private int pageSize = 1 * 1024 * 1024;
     private int dictionaryPageSize = 512;

@@ -19,7 +19,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * !!No Use!!
+ * !!No Use!! Just for TEST
  * Created by Jelly on 6/29/16.
  */
 public class ParquetWriterThread extends WriterThread {

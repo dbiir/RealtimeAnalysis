@@ -21,6 +21,11 @@ producer.thread.num=1
 
 # Loader
 ## LoaderThread
+loader.topic=ndbcdemo
+loader.partition.begin=0
+loader.partition.end=10
+
+## Kafka Consumer
 consumer.group.id=test
 consumer.auto.commit=true
 consumer.auto.commit.interval.ms=1000
@@ -28,9 +33,10 @@ consumer.session.timeout=30000
 consumer.key.deserializer=org.apache.kafka.common.serialization.LongDeserializer
 consumer.value.deserializer=cn.edu.ruc.realtime.utils.MessageDer
 
+## Loader Writer
 writer.batch.size=10000
 
-## Loader thread blocking Queue
+## Loader Blocking Queue
 blocking.queue.size=50000
 
 ## WriterThread
@@ -45,3 +51,4 @@ db.connection.driver.class=org.postgresql.Driver
 db.connection.user=jelly
 db.connection.pass=123456
 db.connection.url=jdbc:postgresql://192.168.7.12/meta
+db.connection.table=meta_table
