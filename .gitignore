@@ -12,3 +12,4 @@ parquet/
 plain/
 local/
 META-INF/
+dist/
