@@ -229,14 +229,14 @@ public class ConfigFactory {
         return Runtime.getRuntime().availableProcessors() * 2;
     }
 
-    public int getThreadQueueSize() {
-        try {
-            return Integer.parseInt(getProps("thread.queue.size"));
-        } catch (PropertyNotExistException e) {
-            systemLogger.exception(e);
-        }
-        return 0;
-    }
+//    public int getThreadQueueSize() {
+//        try {
+//            return Integer.parseInt(getProps("blocking.queue.size"));
+//        } catch (PropertyNotExistException e) {
+//            systemLogger.exception(e);
+//        }
+//        return 0;
+//    }
 
     public String getConsumerGroupId() {
         try {
@@ -393,6 +393,24 @@ public class ConfigFactory {
         return "meta_table";
     }
 
+
+    /**
+     * Blocking queue size for LoaderClient
+     * */
+    public int getBlockingPoolSize() {
+        try {
+            return Integer.parseInt(getProps("blocking.pool.size"));
+        } catch (PropertyNotExistException pe) {
+            systemLogger.exception(pe);
+        } catch (NumberFormatException ne) {
+            systemLogger.exception(ne);
+        }
+        return 10000;
+    }
+
+    /**
+     * Blocking queue size for Loader
+     * */
     public int getBlockingQueueSize() {
         try {
             return Integer.parseInt(getProps("blocking.queue.size"));

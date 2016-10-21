@@ -32,7 +32,7 @@ public class ThreadManager {
 
     private ConfigFactory configFactory = ConfigFactory.getInstance();
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
-    private int blockingQueueSize = configFactory.getThreadQueueSize();
+    private int blockingQueueSize = configFactory.getBlockingQueueSize();
     private int writerThreadNum = configFactory.getWriterThreadNum();
 
     private final List<LoaderThread> loaderMap = new LinkedList<>();
