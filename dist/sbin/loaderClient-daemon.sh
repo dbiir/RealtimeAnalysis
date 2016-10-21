@@ -5,7 +5,7 @@ if [ $# -ne 5 ]; then
     exit 1
 fi
 
-BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ".." && pwd )"
 
 baseFile=$1
 topic=$2
@@ -13,5 +13,5 @@ speed=$3
 length=$4
 sf=$5
 
-java -jar $BASEDIR/../bin/LoaderClient.jar $BASEDIR/../conf/config.props $baseFile $topic $speed $length $sf
+java -jar $BASEDIR/bin/LoaderClient.jar $BASEDIR/conf/config.props $baseFile $topic $speed $length $sf &
 echo "LoaderClient started... Reading from [$baseFile], loading into kafka topic [$topic] expected speed is [$speed], length of each record is around [$length], scale factor is [$sf]."
