@@ -1,5 +1,5 @@
 # Log
-log.dir=../logs
+log.dir=/opt/dist/logs
 logs=system.log,user.log
 
 # LoaderClient
