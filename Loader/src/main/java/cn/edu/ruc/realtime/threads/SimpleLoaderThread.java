@@ -12,6 +12,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,8 +40,8 @@ public class SimpleLoaderThread extends LoaderThread {
     private KafkaConsumer consumer;
 
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
-    private AtomicLong counter = new AtomicLong(0L);
-    private AtomicInteger batchCounter = new AtomicInteger(0);
+//    private AtomicLong counter = new AtomicLong(0L);
+//    private AtomicInteger batchCounter = new AtomicInteger(0);
     private final ThreadLocal<Batch> localBatch = new ThreadLocal<Batch>() {
         @Override
         protected Batch initialValue() {
@@ -67,8 +68,8 @@ public class SimpleLoaderThread extends LoaderThread {
     public void run() {
         consumer = new KafkaConsumer(props);
         TopicPartition topicPartition = new TopicPartition(topic, partition);
-        System.out.println("Parition: " + topicPartition.partition());
-        consumer.assign(Arrays.asList(topicPartition));
+        System.out.println("Partition: " + topicPartition.partition());
+        consumer.assign(Collections.singletonList(topicPartition));
         // TODO seek to the beginning, just for test, should consult the meta server.
         consumer.seekToBeginning(topicPartition);
 //        int msgCounter = 0;
@@ -92,7 +93,7 @@ public class SimpleLoaderThread extends LoaderThread {
                 try {
                     if (localBatch.get().isFull()) {
                         queue.put(localBatch.get());
-//                        System.out.println(queue.size());
+                        System.out.println(queue.size());
                         localBatch.set(new Batch(batchSize, partition));
 //                        batchCounter.getAndIncrement();
 //                        batchCounter++;

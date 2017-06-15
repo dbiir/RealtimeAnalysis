@@ -1,0 +1,167 @@
+======================== Q1-1% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquet1/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q1-2% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquet2/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q1-3% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquet3/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q1-4% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquet4/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q1-5% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquet5/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q1-10% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquet10/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q2-1% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquetpartition1/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q2-2% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquetpartition2/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q2-3% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquetpartition3/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q2-4% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquetpartition4/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q2-5% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquetpartition5/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+
+
+======================== Q2-10% ========================
+import org.apache.spark.sql._
+
+val sqlContext = new SQLContext(sc)
+
+var beginT = System.nanoTime()
+val df01 =sqlContext.read.parquet("hdfs://192.168.7.33:9000/middletest/default/lineparquetpartition10/*")
+df01.registerTempTable("realtime01")
+val result01 = sqlContext.sql("SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime01")
+result01.show()
+var beginE = System.nanoTime()
+println("Time elapsed: " + (beginE-beginT)/1000000 + " ms")
+

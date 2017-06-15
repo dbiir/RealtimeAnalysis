@@ -1,0 +1,6 @@
+create external table lineparquetnew1 (l_orderkey int,l_partkey int,l_suppkey int,l_linenumber int,l_quantity double,l_extendedprice do
+uble,l_discount double,l_tax double,l_returnflag varchar(1),l_linestatus varchar(1),l_shipdate date,l_commitdate date,l_receiptdate date,l_shipinstruct varchar(25),l_sh
+ipmode varchar(10),l_comment varchar(44),l_time date) row format delimited fields terminated by '|' stored as parquet location '/jelly/lineparquet1';
+
+
+create external table lineparquetpartition1(custkey int, orderkey int, partkey int, suppkey int, linenumber int, quantity double, extendedprice double, discount double, tax double, returnflag varchar(1), linestatus varchar(1), shipdate date, commitdate date, receiptdate date, shipinstruct varchar(25), shipmode varchar(10), comment varchar(44), orderstatus varchar(20), totalprice double, orderdate date, orderpriority varchar(100), clerk varchar(100), shippriority int, ordercomment varchar(500), messagedate timestamp) row format delimited fields terminated by '|' stored as parquet location '/middletest/default/lineparquet1';

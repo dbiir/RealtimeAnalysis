@@ -17,10 +17,9 @@ import java.util.*;
 public class Block {
 
     private ConfigFactory configFactory = ConfigFactory.getInstance();
-    private Log systemLogger = LogFactory.getInstance().getSystemLogger();
     private int capacity = configFactory.getWriterBlockSize();
     // partition -> List<Batch>
-    private HashMap<Integer, List<Batch>> bufferMap = new HashMap<>();
+    private HashMap<Long, List<Message>> bufferMap = new HashMap<>();
     // store all sorted messages in block
     private List<Message> content = new LinkedList<>();
     // store meta data
@@ -34,35 +33,30 @@ public class Block {
 
     // sort messages in batchs, and put into content, fill in metas
     public void construct() {
-        long before = System.currentTimeMillis();
+//        long before = System.currentTimeMillis();
         // put messages into content
-        List<Message> partitionContent = new LinkedList<>();
-        for (int key: bufferMap.keySet()) {
-            List<Batch> batches = bufferMap.get(key);
+        for (long key: bufferMap.keySet()) {
+            List<Message> messages = bufferMap.get(key);
             Meta meta = new Meta();
-            long minBeginTimestamp = 0L;
-            long maxEndTimeStamp = 0L;
+            long minBeginTimestamp = messages.get(0).getTimestamp();
+            long maxEndTimeStamp = messages.get(0).getTimestamp();
             // fill in meta
-            for (Batch batch: batches) {
-                partitionContent.addAll(batch.getBatchContent());
+            for (Message message: messages) {
                 // update minBeginTimestamp and maxEndTimestamp.
-                long minTime = batch.getBegimTime();
-                long maxTime = batch.getEndTime();
-                if (minBeginTimestamp == 0L) {
-                    minBeginTimestamp = minTime;
-                } else if (minBeginTimestamp > minTime) {
-                    minBeginTimestamp = minTime;
+                long timestamp = message.getTimestamp();
+                if (timestamp > maxEndTimeStamp) {
+                    maxEndTimeStamp = timestamp;
                 }
-                if (maxEndTimeStamp < maxTime) {
-                    maxEndTimeStamp = maxTime;
+                if (timestamp < minBeginTimestamp) {
+                    minBeginTimestamp = timestamp;
                 }
             }
             meta.setBeginTime(minBeginTimestamp);
             meta.setEndTime(maxEndTimeStamp);
             meta.setFiberId(key);
             metas.add(meta);
-            // sort each message list specified to each fiber.
-            partitionContent.sort(
+            // sort messages of the same fiber by timestamp.
+            messages.sort(
                     new Comparator<Message>() {
                         @Override
                         public int compare(Message m1, Message m2) {
@@ -70,12 +64,12 @@ public class Block {
                         }
                     }
             );
-            content.addAll(partitionContent);
-            partitionContent.clear();
+            content.addAll(messages);
+            messages.clear();
         }
         blockMinTimestamp = getMinTimestamp();
         blockMaxTimestamp = getMaxTimestamp();
-        long end = System.currentTimeMillis();
+//        long end = System.currentTimeMillis();
 //        System.out.println("Construction cost: " + (end - before) + " ms");
 //        systemLogger.info("Construction cost: " + (end - before) + " ms");
     }
@@ -91,12 +85,13 @@ public class Block {
     }
 
     public void addBatch(Batch batch) {
-        int key = batch.getPartition();
-        if (bufferMap.get(key) == null) {
-            List<Batch> list = new ArrayList<>();
-            bufferMap.put(key, list);
+        for (Message msg : batch.getBatchContent()) {
+            long key = msg.getKey();
+            if (!bufferMap.containsKey(key)) {
+                bufferMap.put(key, new ArrayList<Message>());
+            }
+            bufferMap.get(key).add(msg);
         }
-        bufferMap.get(key).add(batch);
         counter++;
     }
 
@@ -104,7 +99,7 @@ public class Block {
         return counter >= capacity;
     }
 
-    public Set<Integer> getFiberId() {
+    public Set<Long> getFiberId() {
         return bufferMap.keySet();
     }
 

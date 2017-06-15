@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
  * {@link SimpleWriterThread} is responsible for reading from {@link BlockingQueue}, and write out.
  */
 public class ThreadManager {
-    private static int threadNum = Runtime.getRuntime().availableProcessors() * 2;
+//    private static int threadNum = Runtime.getRuntime().availableProcessors() * 2;
     private int partitionNum;
     private List<Integer> partitionIds;
     private String topic;
@@ -43,7 +43,7 @@ public class ThreadManager {
         this.topic = topic;
         this.partitionIds = partitionIds;
         partitionNum = partitionIds.size();
-        executor = Executors.newFixedThreadPool(threadNum);
+        executor = Executors.newFixedThreadPool(partitionIds.size()+1);
     }
 
     public void execute() {

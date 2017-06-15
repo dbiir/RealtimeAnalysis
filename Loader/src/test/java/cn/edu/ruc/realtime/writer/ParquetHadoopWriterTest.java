@@ -13,14 +13,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by Jelly on 6/29/16.
+ * RealTimeAnalysis
+ * @author guodong
  */
 public class ParquetHadoopWriterTest {
     private static BufferedReader reader;
 
     public static void main(String[] args) {
         try {
-            reader = new BufferedReader(new FileReader("/Users/Jelly/Developer/RealTimeAnalysis/resources/lineorderaa"));
+            reader = new BufferedReader(new FileReader("/Users/Jelly/Developer/RealTimeAnalysis/resources/lineorderaa.parquet"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -28,12 +29,12 @@ public class ParquetHadoopWriterTest {
         ParquetHadoopWriter writer = new ParquetHadoopWriter();
         long beginTimestamp = 100000000L;
         long endTimestamp = 200000000L;
-        Set<Integer> ids = new HashSet<>();
-        for (int i = 0; i < 5; i++) {
+        Set<Long> ids = new HashSet<Long>();
+        for (long i = 0L; i < 5L; i++) {
             ids.add(i);
         }
 
-        List<Message> messages = new ArrayList<>();
+        List<Message> messages = new ArrayList<Message>();
         String line;
         try {
             while ((line = reader.readLine()) != null) {

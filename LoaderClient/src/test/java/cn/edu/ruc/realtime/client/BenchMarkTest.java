@@ -2,14 +2,17 @@ package cn.edu.ruc.realtime.client;
 
 import cn.edu.ruc.realtime.model.Message;
 import cn.edu.ruc.realtime.utils.ConfigFactory;
+import cn.edu.ruc.realtime.utils.Function0;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * RealTimeAnalysis
@@ -49,6 +52,8 @@ public class BenchMarkTest {
 
     public static void contralSpeed(LoaderClient client, String fileName, double speed,int length, int factor)throws IOException {
         List<Message> nodelist = new LinkedList<Message>();
+        Function0 function0 = new Function0(80);
+        Map<Long, Long> statistics = new HashMap<>();
 
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(
@@ -59,7 +64,12 @@ public class BenchMarkTest {
             int i;
             for(i=0;i<line.length();i++)  if(line.charAt(i)=='|')  break;
             String Key=line.substring(0,i);
-            long l=Long.parseLong(Key);
+            //long l=Long.parseLong(Key);
+            long l = function0.apply(Key);
+            if (!statistics.containsKey(l)) {
+                statistics.put(l, 0L);
+            }
+            statistics.put(l, statistics.get(l) + 1L);
             nodelist.add(new Message(l,line));
         }
 
@@ -101,7 +111,7 @@ public class BenchMarkTest {
 
                 // add timestamp; sent message
                 long test = System.currentTimeMillis();
-                String withTimestamp = node.getValue() + "|" + new Timestamp(test);
+                String withTimestamp = node.getValue() + "|" + test;
                 Message msg = new Message(node.getKey(), withTimestamp);
                 msg.setTimestamp(test);
                 client.sendMessage(msg);
@@ -118,5 +128,9 @@ public class BenchMarkTest {
         long End=System.currentTimeMillis();
         System.out.println("Total speed " + total*length*1000/1024/1024/(End-Start) + "MB/S. Cost: " + (End-Start) + " ms.");
         br.close();
+        System.out.println("Statistics:");
+        for (long k : statistics.keySet()) {
+            System.out.println("Fiber id [" + k + "], message num: " + statistics.get(k));
+        }
     }
 }

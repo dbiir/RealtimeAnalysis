@@ -60,12 +60,12 @@ public class LoaderClient {
     }
 
     /**
-     * Create a topic
-     * @param topic name of topic
+     * Create table
+     * @param table name of topic
      * @deprecated
      * */
-    private void createTopic(String topic, int partitionNum, int replication) {
-        // TODO create topic
+    private void createTable(String table, int partitionNum, int replication) {
+        // TODO create table
     }
 
     /**

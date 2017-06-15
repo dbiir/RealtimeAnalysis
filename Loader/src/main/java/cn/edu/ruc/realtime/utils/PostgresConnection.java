@@ -58,32 +58,36 @@ public class PostgresConnection extends DBConnection {
 
     @Override
     public void commitPartitionOffset(int partition, long offset) {
-        StringBuffer sb = new StringBuffer();
+//        StringBuffer sb = new StringBuffer();
         // if exists update else insert
 //        sb.append("INSERT INTO offset VALUES(").append(partition).append(", ").append(offset).append(");");
     }
 
     @Override
     public void commitPartitionOffsets(HashMap<Integer, Long> commitMap) {
-        StringBuffer sb = new StringBuffer();
+//        StringBuffer sb = new StringBuffer();
         // if exists update else insert
     }
 
     /**
      * INSERT INTO metatable VALUES(partition, 'file', 'begin', 'end');
      * */
-    public void commitMetaRecord(int partition, String file, Timestamp beginTime, Timestamp endTime) {
+    public void commitMetaRecord(long partition, String file, long beginTime, long endTime) {
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO ")
                 .append(tableN)
-                .append(" VALUES(")
+                .append(" VALUES('")
+                .append(configFactory.getWriterDBName())
+                .append("', '")
+                .append(configFactory.getWriterTableName())
+                .append("', ")
                 .append(partition)
-                .append(",'")
-                .append(file)
-                .append("','")
+                .append(", ")
                 .append(beginTime)
-                .append("','")
+                .append(", ")
                 .append(endTime)
+                .append(", '")
+                .append(file)
                 .append("');");
         execUpdate(sb.toString());
     }

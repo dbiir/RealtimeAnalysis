@@ -298,6 +298,26 @@ public class ConfigFactory {
         return "cn.edu.ruc.realtime.utils.MessageDer";
     }
 
+    public String getWriterDBName()
+    {
+        try {
+            return getProps("writer.db.name");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "test";
+    }
+
+    public String getWriterTableName()
+    {
+        try {
+            return getProps("writer.table.name");
+        } catch (PropertyNotExistException e) {
+            systemLogger.exception(e);
+        }
+        return "lineorders";
+    }
+
     public String getWriterFilePath() {
         try {
             return getProps("writer.file.path");

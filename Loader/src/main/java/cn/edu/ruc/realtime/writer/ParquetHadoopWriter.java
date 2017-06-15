@@ -13,6 +13,7 @@ import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.MessageTypeParser;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -38,10 +39,10 @@ public class ParquetHadoopWriter implements Writer {
             "required int32 partkey; " +
             "required int32 suppkey; " +
             "required int32 linenumber; " +
-            "required float quantity; " +
-            "required float extendedprice; " +
-            "required float discount; " +
-            "required float tax; " +
+            "required double quantity; " +
+            "required double extendedprice; " +
+            "required double discount; " +
+            "required double tax; " +
             "required binary returnflag; " +
             "required binary linestatus; " +
             "required binary shipdate; " +
@@ -51,13 +52,13 @@ public class ParquetHadoopWriter implements Writer {
             "required binary shipmode; " +
             "required binary comment; " +
             "required binary orderstatus; " +
-            "required float totalprice; " +
+            "required double totalprice; " +
             "required binary orderdate; " +
             "required binary orderpriority; " +
             "required binary clerk; " +
             "required int32 shippriority; " +
             "required binary ordercomment; " +
-            "required binary messagedate; " +
+            "required int64 messagedate; " +
             "}");
     private GroupWriteSupport groupWriteSupport = new GroupWriteSupport();
     private SimpleGroupFactory simpleGroupFactory = new SimpleGroupFactory(schema);
@@ -96,10 +97,10 @@ public class ParquetHadoopWriter implements Writer {
                                 .append("partkey", Integer.parseInt(recordS[2]))
                                 .append("suppkey", Integer.parseInt(recordS[3]))
                                 .append("linenumber", Integer.parseInt(recordS[4]))
-                                .append("quantity", Float.parseFloat(recordS[5]))
-                                .append("extendedprice", Float.parseFloat(recordS[6]))
-                                .append("discount", Float.parseFloat(recordS[7]))
-                                .append("tax", Float.parseFloat(recordS[8]))
+                                .append("quantity", Double.parseDouble(recordS[5]))
+                                .append("extendedprice", Double.parseDouble(recordS[6]))
+                                .append("discount", Double.parseDouble(recordS[7]))
+                                .append("tax", Double.parseDouble(recordS[8]))
                                 .append("returnflag", recordS[9])
                                 .append("linestatus", recordS[10])
                                 .append("shipdate", recordS[11])
@@ -109,13 +110,13 @@ public class ParquetHadoopWriter implements Writer {
                                 .append("shipmode", recordS[15])
                                 .append("comment", recordS[16])
                                 .append("orderstatus", recordS[17])
-                                .append("totalprice", Float.parseFloat(recordS[18]))
+                                .append("totalprice", Double.parseDouble(recordS[18]))
                                 .append("orderdate", recordS[19])
                                 .append("orderpriority", recordS[20])
                                 .append("clerk", recordS[21])
                                 .append("shippriority", Integer.parseInt(recordS[22]))
                                 .append("ordercomment", recordS[23])
-                                .append("messagedate", recordS[24])
+                                .append("messagedate", Long.parseLong(recordS[24]))
                 );
             }
             parquetWriter.close();
@@ -127,18 +128,20 @@ public class ParquetHadoopWriter implements Writer {
     }
 
     @Override
-    public String write(Set<Integer> ids, List<Message> messages, long beginTimestamp, long endTimestamp) {
+    public String write(Set<Long> ids, List<Message> messages, long beginTimestamp, long endTimestamp) {
         // calculate path name
         StringBuilder sb = new StringBuilder();
         int counter = 0;
-        Iterator<Integer> iterator = ids.iterator();
+        Iterator<Long> iterator = ids.iterator();
         sb.append(basePath);
         while (iterator.hasNext() && counter < 5) {
             sb.append(iterator.next());
+            counter++;
         }
-        sb.append(beginTimestamp);
-        sb.append(endTimestamp);
-        sb.append((Math.random() * endTimestamp + beginTimestamp) * Math.random());
+        sb.append(beginTimestamp)
+                .append(endTimestamp)
+                .append((Math.random() * endTimestamp + beginTimestamp) * Math.random())
+                .append(".parquet");
         // write
         if (write(messages, sb.toString())) {
             return sb.toString();

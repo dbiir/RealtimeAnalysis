@@ -19,7 +19,7 @@ public class ConsoleWriter implements Writer {
     }
 
     @Override
-    public String write(Set<Integer> ids, List<Message> messages, long beginTimestamp, long endTimestamp) {
+    public String write(Set<Long> ids, List<Message> messages, long beginTimestamp, long endTimestamp) {
         return null;
     }
 }

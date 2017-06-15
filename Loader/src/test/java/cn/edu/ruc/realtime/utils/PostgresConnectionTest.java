@@ -1,7 +1,5 @@
 package cn.edu.ruc.realtime.utils;
 
-import java.sql.Timestamp;
-
 /**
  * RealTimeAnalysis
  *
@@ -14,7 +12,7 @@ public class PostgresConnectionTest {
     public static void main(String[] args) {
         PostgresConnection conn = new PostgresConnection();
 //        conn.execUpdate("CREATE TABLE metaTable (partition INT, file VARCHAR(300), beginTime TIMESTAMP, endTime TIMESTAMP);");
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        long timestamp = System.currentTimeMillis();
         conn.commitMetaRecord(3, "tiss", timestamp, timestamp);
         conn.close();
     }

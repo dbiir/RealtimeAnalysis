@@ -32,7 +32,7 @@ public class SimpleWriterThread extends WriterThread {
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
     private AtomicLong counter = new AtomicLong(0L);
 
-    public SimpleWriterThread(String threadName, BlockingQueue queue) {
+    public SimpleWriterThread(String threadName, BlockingQueue<Batch> queue) {
         this.threadName = threadName;
         this.queue = queue;
     }
@@ -123,8 +123,8 @@ public class SimpleWriterThread extends WriterThread {
      * Commit to meta server
      * fiberId, beginTime, endTime, filename
      * */
-    public void commitMeta(int fiberId, long beginTime, long endTime, String filename) {
-        dbConnection.commitMetaRecord(fiberId, filename, new Timestamp(beginTime), new Timestamp(endTime));
+    public void commitMeta(long fiberId, long beginTime, long endTime, String filename) {
+        dbConnection.commitMetaRecord(fiberId, filename, beginTime, endTime);
 //        System.out.println("Meta: " + fiberId + "-" + beginTime + "-" + endTime + "-" + filename);
     }
 

@@ -35,10 +35,10 @@ public class HadoopWriter implements Writer {
     }
 
     @Override
-    public synchronized String write(Set<Integer> ids, List<Message> messages, long beginTime, long endTime) {
+    public synchronized String write(Set<Long> ids, List<Message> messages, long beginTime, long endTime) {
         StringBuilder sb = new StringBuilder();
         int counter = 0;
-        Iterator<Integer> iterator = ids.iterator();
+        Iterator<Long> iterator = ids.iterator();
         sb.append(basePath);
         while (iterator.hasNext() && counter < 5) {
             sb.append(iterator.next());

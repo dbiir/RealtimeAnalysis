@@ -11,6 +11,6 @@ public abstract class DBConnection {
 
     public abstract void commitPartitionOffset(int partition, long offset);
     public abstract void commitPartitionOffsets(HashMap<Integer, Long> commitMap);
-    public abstract void commitMetaRecord(int partition, String file, Timestamp begin, Timestamp end);
+    public abstract void commitMetaRecord(long partition, String file, long begin, long end);
     public abstract ResultSet execQuery(String sql);
 }

@@ -15,5 +15,5 @@ public interface Writer {
      * @param messages messages
      * @return if success, return filename
      * */
-    public String write(Set<Integer> ids, List<Message> messages, long beginTimestamp, long endTimestamp);
+    public String write(Set<Long> ids, List<Message> messages, long beginTimestamp, long endTimestamp);
 }

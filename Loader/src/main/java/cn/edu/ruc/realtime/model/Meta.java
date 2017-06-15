@@ -7,16 +7,16 @@ package cn.edu.ruc.realtime.model;
  */
 public class Meta {
 
-    private int fiberId;
+    private long fiberId;
     private long beginTime;
     private long endTime;
     private String filename;
 
-    public int getFiberId() {
+    public long getFiberId() {
         return fiberId;
     }
 
-    public void setFiberId(int fiberId) {
+    public void setFiberId(long fiberId) {
         this.fiberId = fiberId;
     }
 

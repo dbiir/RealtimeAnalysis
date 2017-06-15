@@ -1,0 +1,33 @@
+create table realtime(custkey integer, orderkey integer, partkey integer, suppkey integer, linenumber integer, quantity double, extendedprice double, discount double, tax double, returnflag varchar(1), linestatus varchar(1), shipdate date, commitdate date, receiptdate date, shipinstruct varchar(25), shipmode varchar(10), comment varchar(44), orderstatus varchar(20), totalprice double, orderdate date, orderpriority varchar(100), clerk varchar(100), shippriority integer, ordercomment varchar(500), messagedate timestamp) fiber partition by (custkey) using function function0 timestamp by (messagedate);
+
+create table realtimetest(custkey integer, orderkey integer, partkey integer, suppkey integer, linenumber integer, quantity double, extendedprice double, discount double, tax double, returnflag varchar(1), linestatus varchar(1), shipdate varchar(20), commitdate varchar(20), receiptdate varchar(20), shipinstruct varchar(25), shipmode varchar(10), comment varchar(44), orderstatus varchar(20), totalprice double, orderdate varchar(20), orderpriority varchar(100), clerk varchar(100), shippriority integer, ordercomment varchar(500), messagedate timestamp) fiber partition by (custkey) using function function0 timestamp by (messagedate);
+
+SELECT sum(quantity) AS sum_qty, sum(extendedprice) AS sum_base_price, avg(quantity) AS avg_qty, avg(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime where messagedate<timestamp '2017-06-01 20:12:05' and messagedate>timestamp '2017-06-01 20:11:45'
+
+SELECT sum(quantity) AS sum_qty, sum(extendedprice) AS sum_base_price, avg(quantity) AS avg_qty, avg(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime where custkey = c AND messagedate > s1 and messagedate < s2
+
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquet1;
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquet2;
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquet4;
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquet5;
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquet10;
+
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquetpartition1;
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquetpartition2;
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquetpartition4;
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquetpartition5;
+SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquetpartition10;
+
+select custkey, orderkey, partkey, suppkey, linenumber, shipdate, commitdate, receiptdate, messagedate from lineparquet2 limit 5;
+
+avg(quantity) AS avg_qty, avg(extendedprice) AS avg_price, avg(discount) AS avg_disc, 
+sum(quantity) AS sum_qty, sum(extendedprice) AS sum_base_price, 
+
+sync; echo 1 > /proc/sys/vm/drop_caches
+sync; echo 2 > /proc/sys/vm/drop_caches
+sync; echo 3 > /proc/sys/vm/drop_caches
+
+
+hdfs://192.168.7.33:9000///jelly/midletest5/12149253467425714925351123922.3672171434178287E11
+
+scp -P 10022 root@10.77.50.27:~/*.nmon ./*.nmon

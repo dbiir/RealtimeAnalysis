@@ -22,7 +22,6 @@ public class KafkaProducerThread extends ProducerThread {
     private String threadName;
     private ConfigFactory config = ConfigFactory.getInstance();
     private BlockingQueue<Message> queue;
-    private Properties props = new Properties();
     private Log systemLogger = LogFactory.getInstance().getSystemLogger();
 
     private AtomicBoolean isReadyToStop = new AtomicBoolean(false);
@@ -35,6 +34,7 @@ public class KafkaProducerThread extends ProducerThread {
         this.threadName = threadName;
         this.queue = queue;
 
+        Properties props = new Properties();
         props.put("acks", config.getAcks());
         props.put("retries", config.getRetries());
         props.put("batch.size", config.getBatchSize());
@@ -46,7 +46,7 @@ public class KafkaProducerThread extends ProducerThread {
         // partitioner class
         props.put("partitioner.class", config.getPartitioner());
 
-        producer = new KafkaProducer(props);
+        producer = new KafkaProducer<>(props);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class KafkaProducerThread extends ProducerThread {
             }
             try {
                 Message msg = queue.take();
-                producer.send(new ProducerRecord(topic, msg.getKey(), msg));
+                producer.send(new ProducerRecord<>(topic, msg.getKey(), msg));
                 msgCounter.getAndIncrement();
             } catch (InterruptedException e) {
                 systemLogger.exception(e);

@@ -14,3 +14,4 @@ local/
 META-INF/
 dist/
 docs/download/
+target/
