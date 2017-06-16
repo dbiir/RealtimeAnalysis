@@ -41,18 +41,19 @@ public class LoaderClient {
     private ProducerThreadPool loaderPool;
     private String topic;
     private Log systemLogger;
-    private ConfigFactory configFactory = ConfigFactory.getInstance();
-    private int producerTNum = configFactory.getProducerThreadNum();
+    private final ConfigFactory configFactory;
+    private final int producerTNum;
 
     /**
      * @param topic every client has one topic
      * */
-    public LoaderClient(String topic) {
+    public LoaderClient(String topic, String config) {
         this.topic = topic;
+        configFactory = ConfigFactory.getInstance(config);
+        producerTNum = configFactory.getProducerThreadNum();
         loaderPool = new ProducerThreadPool(topic);
         for (int i = 0; i < producerTNum; i++) {
             ProducerThread thread = new KafkaProducerThread(topic, "KafkaProducer" + i, loaderPool.getQueue());
-//            ProducerThread thread = new SimpleProducerThread("SimpleProducer" + i, loaderPool.getQueue());
             loaderPool.addConsumer(thread);
         }
         loaderPool.execute();

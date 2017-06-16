@@ -39,8 +39,8 @@ public class BenchMarkTest {
         String length = args[4];
         String factor = args[5];
 
-        ConfigFactory config = ConfigFactory.getInstance(props);
-        LoaderClient client = new LoaderClient(topic);
+//        ConfigFactory config = ConfigFactory.getInstance(props);
+        LoaderClient client = new LoaderClient(topic, props);
 
         try {
             contralSpeed(client, input, Integer.parseInt(speed), Integer.parseInt(length), Integer.parseInt(factor));
