@@ -12,7 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Jelly on 6/28/16.
+ * RealTimeAnalysis
+ * @author guodong
  */
 public class LoaderClientTest {
 
@@ -28,7 +29,7 @@ public class LoaderClientTest {
         String topic = args[2];
 
         // load config
-        ConfigFactory configFactory = ConfigFactory.getInstance(props);
+//        ConfigFactory configFactory = ConfigFactory.getInstance(props);
         Log userLogger = LogFactory.getInstance().getLogger("user.log");
 
         BufferedReader reader = new BufferedReader(new FileReader(input));
@@ -36,7 +37,7 @@ public class LoaderClientTest {
 
         String line;
 
-        LoaderClient client = new LoaderClient(topic);
+        LoaderClient client = new LoaderClient(topic, props);
 
         System.out.println("Start reading from file...");
         while ((line = reader.readLine()) != null) {

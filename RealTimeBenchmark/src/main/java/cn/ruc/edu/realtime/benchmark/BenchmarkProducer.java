@@ -26,9 +26,9 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
  */
 public class BenchmarkProducer
 {
-    private static final String REDIS_KEY = "lineorder";
+    private static final String REDIS_KEY = "lineorder10";
     private static final int PIPELINE_SIZE = 1000;
-    // params: --topic TOPIC1 --scale-factor 100 --redis LOCALHOST:3456 --fiber-num 80 config
+    // params: --topic TOPIC1 --scale-factor 10 --redis LOCALHOST:3456 --fiber-num 80 config
     public static void main(String[] args)
     {
         ArgumentParser parser = argParser();
@@ -46,7 +46,7 @@ public class BenchmarkProducer
             Pipeline redisPipeline = jedis.pipelined();
 
             Iterator<Lineorder> iterator = new LineorderGenerator(sf, 10, 100).iterator();
-            final LoaderClient client = new LoaderClient(topicName, configFile);
+//            final LoaderClient client = new LoaderClient(topicName, configFile);
 
             final Function0 function = new Function0(fiberNum);
 
@@ -64,6 +64,7 @@ public class BenchmarkProducer
                 }
             }
             long pushEnd = System.currentTimeMillis();
+            System.out.println("Push num: " + pushCount + ", push cost: " + (pushEnd - pushStart) + "ms");
 
             long pullCount = 0L;
             pushCount = pushCount - (pullCount % PIPELINE_SIZE);
@@ -78,15 +79,17 @@ public class BenchmarkProducer
                     redisPipeline.sync();
                     responses.parallelStream().forEach(res -> {
                         String line = (String) res.get();
-                        String[] lineParts = line.split("|");
+                        String[] lineParts = line.split("\\|");
                         Message message = new Message(function.apply(lineParts[0]), line);
-                        message.setTimestamp(Long.parseLong(lineParts[15]));
-                        client.sendMessage(message);
+                        message.setTimestamp(Long.parseLong(lineParts[24]));
+                        System.out.println(message.toString());
+//                        client.sendMessage(message);
                     });
                     responses.clear();
                 }
             }
             long pullEnd = System.currentTimeMillis();
+            System.out.println("Pull num: " + pullCount + ", pull cost: " + (pullEnd - pullStart) + "ms");
         }
         catch (ArgumentParserException e)
         {
@@ -141,7 +144,7 @@ public class BenchmarkProducer
                 .dest("redisPort")
                 .help("Port of redis server");
 
-        parser.addArgument("config-file")
+        parser.addArgument("--config-file")
                 .required(true)
                 .action(store())
                 .type(String.class)
