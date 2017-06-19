@@ -1,4 +1,4 @@
-package cn.ruc.edu.realtime.generator;
+package cn.edu.ruc.realtime.generator;
 
 import io.airlift.tpch.TpchColumn;
 import io.airlift.tpch.TpchColumnType;

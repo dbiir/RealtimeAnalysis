@@ -1,4 +1,4 @@
-package cn.ruc.edu.realtime.generator;
+package cn.edu.ruc.realtime.generator;
 
 import com.google.common.collect.AbstractIterator;
 import io.airlift.tpch.CustomerGenerator;

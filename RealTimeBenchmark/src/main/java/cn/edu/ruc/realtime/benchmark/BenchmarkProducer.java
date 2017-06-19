@@ -1,10 +1,9 @@
-package cn.ruc.edu.realtime.benchmark;
+package cn.edu.ruc.realtime.benchmark;
 
-import cn.edu.ruc.realtime.client.LoaderClient;
+import cn.edu.ruc.realtime.generator.Lineorder;
 import cn.edu.ruc.realtime.model.Message;
 import cn.edu.ruc.realtime.utils.Function0;
-import cn.ruc.edu.realtime.generator.Lineorder;
-import cn.ruc.edu.realtime.generator.LineorderGenerator;
+import cn.edu.ruc.realtime.generator.LineorderGenerator;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -26,7 +25,6 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
  */
 public class BenchmarkProducer
 {
-    private static final String REDIS_KEY = "lineorder10";
     private static final int PIPELINE_SIZE = 1000;
     // params: --topic TOPIC1 --scale-factor 10 --redis LOCALHOST:3456 --fiber-num 80 config
     public static void main(String[] args)
@@ -41,6 +39,7 @@ public class BenchmarkProducer
             String configFile = namespace.getString("configFile");
             int sf = namespace.getInt("sf");
             int fiberNum = namespace.getInt("fiberNum");
+            String redisKey = namespace.getString("redisKey");
 
             Jedis jedis = new Jedis(redisHost, redisPort);
             Pipeline redisPipeline = jedis.pipelined();
@@ -56,7 +55,7 @@ public class BenchmarkProducer
             while (iterator.hasNext())
             {
                 Lineorder lineorder = iterator.next();
-                redisPipeline.rpush(REDIS_KEY, lineorder.toLine());
+                redisPipeline.rpush(redisKey, lineorder.toLine());
                 pushCount++;
                 if (pushCount % PIPELINE_SIZE == 0)
                 {
@@ -72,7 +71,7 @@ public class BenchmarkProducer
             List<Response> responses = new ArrayList<>(PIPELINE_SIZE);
             while (pullCount < pushCount)
             {
-                responses.add(redisPipeline.lpop(REDIS_KEY));
+                responses.add(redisPipeline.lpop(redisKey));
                 pullCount++;
                 if (pullCount % PIPELINE_SIZE == 0)
                 {
@@ -82,7 +81,6 @@ public class BenchmarkProducer
                         String[] lineParts = line.split("\\|");
                         Message message = new Message(function.apply(lineParts[0]), line);
                         message.setTimestamp(Long.parseLong(lineParts[24]));
-                        System.out.println(message.toString());
 //                        client.sendMessage(message);
                     });
                     responses.clear();
@@ -93,7 +91,16 @@ public class BenchmarkProducer
         }
         catch (ArgumentParserException e)
         {
-            e.printStackTrace();
+            if (args.length == 0)
+            {
+                parser.printHelp();
+                System.exit(0);
+            }
+            else
+            {
+                parser.handleError(e);
+                System.exit(1);
+            }
         }
     }
 
@@ -143,6 +150,14 @@ public class BenchmarkProducer
                 .metavar("REDIS-PORT")
                 .dest("redisPort")
                 .help("Port of redis server");
+
+        parser.addArgument("--redis-key")
+                .required(true)
+                .action(store())
+                .type(String.class)
+                .metavar("REDIS-KEY")
+                .dest("redisKey")
+                .help("Redis key name");
 
         parser.addArgument("--config-file")
                 .required(true)
