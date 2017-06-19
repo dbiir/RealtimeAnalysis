@@ -37,7 +37,7 @@ public class ThreadManager {
 
     private final List<LoaderThread> loaderMap = new LinkedList<>();
     private final List<WriterThread> writerMap = new LinkedList<>();
-    private final BlockingQueue<Batch> queue = new ArrayBlockingQueue(blockingQueueSize);
+    private final BlockingQueue<Batch> queue = new ArrayBlockingQueue<>(blockingQueueSize);
 
     public ThreadManager(String topic, List<Integer> partitionIds) {
         this.topic = topic;

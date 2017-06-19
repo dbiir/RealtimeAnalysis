@@ -22,8 +22,8 @@ import java.util.Map;
  *
  * @author Jelly
  */
-public class BenchMarkTest {
-
+public class BenchMark
+{
     public static void main(String[] args) {
 
         if (args.length != 6) {

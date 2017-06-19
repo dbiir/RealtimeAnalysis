@@ -92,10 +92,10 @@ public class ParquetHadoopWriter implements Writer {
                 }
                 parquetWriter.write(
                         simpleGroupFactory.newGroup()
-                                .append("custkey", Integer.parseInt(recordS[0]))
-                                .append("orderkey", Integer.parseInt(recordS[1]))
-                                .append("partkey", Integer.parseInt(recordS[2]))
-                                .append("suppkey", Integer.parseInt(recordS[3]))
+                                .append("custkey",Long.parseLong(recordS[0]))
+                                .append("orderkey", Long.parseLong(recordS[1]))
+                                .append("partkey", Long.parseLong(recordS[2]))
+                                .append("suppkey", Long.parseLong(recordS[3]))
                                 .append("linenumber", Integer.parseInt(recordS[4]))
                                 .append("quantity", Double.parseDouble(recordS[5]))
                                 .append("extendedprice", Double.parseDouble(recordS[6]))
