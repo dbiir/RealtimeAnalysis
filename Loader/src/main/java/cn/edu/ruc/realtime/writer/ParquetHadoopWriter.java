@@ -34,10 +34,10 @@ public class ParquetHadoopWriter implements Writer {
     private CompressionCodecName compressionCodecName = CompressionCodecName.UNCOMPRESSED;
     private ParquetProperties.WriterVersion writerVersion = ParquetProperties.WriterVersion.PARQUET_2_0;
     private MessageType schema = MessageTypeParser.parseMessageType("message lineorders {" +
-            "required int32 custkey; " +
-            "required int32 orderkey; " +
-            "required int32 partkey; " +
-            "required int32 suppkey; " +
+            "required int64 custkey; " +
+            "required int64 orderkey; " +
+            "required int64 partkey; " +
+            "required int64 suppkey; " +
             "required int32 linenumber; " +
             "required double quantity; " +
             "required double extendedprice; " +

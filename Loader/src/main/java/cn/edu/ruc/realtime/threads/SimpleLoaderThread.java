@@ -93,7 +93,7 @@ public class SimpleLoaderThread extends LoaderThread {
                 try {
                     if (localBatch.get().isFull()) {
                         queue.put(localBatch.get());
-                        System.out.println(queue.size());
+//                        System.out.println(queue.size());
                         localBatch.set(new Batch(batchSize, partition));
 //                        batchCounter.getAndIncrement();
 //                        batchCounter++;

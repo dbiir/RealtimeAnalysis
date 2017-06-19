@@ -1,5 +1,6 @@
 package cn.edu.ruc.realtime.benchmark;
 
+import cn.edu.ruc.realtime.client.LoaderClient;
 import cn.edu.ruc.realtime.generator.Lineorder;
 import cn.edu.ruc.realtime.model.Message;
 import cn.edu.ruc.realtime.utils.Function0;
@@ -26,7 +27,7 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
 public class BenchmarkProducer
 {
     private static final int PIPELINE_SIZE = 1000;
-    // params: --topic TOPIC1 --scale-factor 10 --redis LOCALHOST:3456 --fiber-num 80 config
+    // scale-factor 100 around 1GB
     public static void main(String[] args)
     {
         ArgumentParser parser = argParser();
@@ -45,7 +46,7 @@ public class BenchmarkProducer
             Pipeline redisPipeline = jedis.pipelined();
 
             Iterator<Lineorder> iterator = new LineorderGenerator(sf, 10, 100).iterator();
-//            final LoaderClient client = new LoaderClient(topicName, configFile);
+            final LoaderClient client = new LoaderClient(topicName, configFile);
 
             final Function0 function = new Function0(fiberNum);
 
@@ -81,13 +82,15 @@ public class BenchmarkProducer
                         String[] lineParts = line.split("\\|");
                         Message message = new Message(function.apply(lineParts[0]), line);
                         message.setTimestamp(Long.parseLong(lineParts[24]));
-//                        client.sendMessage(message);
+                        client.sendMessage(message);
                     });
                     responses.clear();
                 }
             }
             long pullEnd = System.currentTimeMillis();
             System.out.println("Pull num: " + pullCount + ", pull cost: " + (pullEnd - pullStart) + "ms");
+            jedis.close();
+//            client.shutdown();
         }
         catch (ArgumentParserException e)
         {
