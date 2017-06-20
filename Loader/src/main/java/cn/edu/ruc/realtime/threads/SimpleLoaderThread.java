@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by Jelly on 6/29/16.
  * Loader Thread.
- * Each thread pulls data from specified partition of Kafka, and essemble data into {@link Batch} in thread, and then
+ * Each thread pulls data from specified partition of Kafka, and assemble data into {@link Batch} in thread, and then
  * put Batch into shared buffer. When shared buffer is ready to write, {@link SimpleWriterThread} will write shared
  * buffer block out.
  */

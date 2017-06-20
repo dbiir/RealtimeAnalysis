@@ -39,7 +39,7 @@ public class ProducerThreadPool {
             queueSize = config.getBlockingPoolSize();
         executor = Executors.newFixedThreadPool(threadPoolSize);
         this.topic = topic;
-        queue = new ArrayBlockingQueue(queueSize);
+        queue = new ArrayBlockingQueue<>(queueSize);
         consumerList = new ArrayList<>(threadPoolSize);
     }
 
