@@ -414,6 +414,7 @@ public class BenchmarkQuery
                 e.printStackTrace();
             }
         }
+        System.out.println("Done randomly generate customer keys. Current timestamp: " + new Timestamp(System.currentTimeMillis()));
         return custKeyBase.toArray(new String[0]);
     }
 }
