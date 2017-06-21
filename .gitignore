@@ -5,6 +5,8 @@ META-INF/
 *.class
 *.iml
 *.log
+*.gz
+*.tar
 resources/
 result
 out/

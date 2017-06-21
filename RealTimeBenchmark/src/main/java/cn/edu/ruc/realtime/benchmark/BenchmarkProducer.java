@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static net.sourceforge.argparse4j.impl.Arguments.store;
 
@@ -43,14 +46,16 @@ public class BenchmarkProducer
             String configPath = namespace.getString("configPath");
             int sf = namespace.getInt("sf");
             int fiberNum = namespace.getInt("fiberNum");
-            String mode = namespace.getString("action");
+            String mode = namespace.getString("mode");
+
+            BenchmarkProducer benchmarkProducer = new BenchmarkProducer();
 
             switch (mode.toUpperCase())
             {
                 case "W": generateAndSpill(filePath, sf, true); break;
                 case "R": readAndSend(filePath, topicName, configPath, fiberNum); break;
                 case "WR": generateAndSend(filePath, sf, topicName, configPath, fiberNum); break;
-                case "D": generateAndSendDirect(sf, topicName, configPath, fiberNum); break;
+                case "D": benchmarkProducer.generateAndSendDirect(sf, topicName, configPath, fiberNum); break;
                 default: throw new ArgumentParserException("No matching mode!", parser);
             }
         }
@@ -154,24 +159,20 @@ public class BenchmarkProducer
      * @param configPath path of configuration file for LoaderClient
      * @param fiberNum num of fibers
      */
-    private static void generateAndSendDirect(int sf, String topicName, String configPath, int fiberNum)
+    private void generateAndSendDirect(int sf, String topicName, String configPath, int fiberNum)
     {
-        final Iterator<Lineorder> iterator = new LineorderGenerator(sf, 10, 100).iterator();
-        final LoaderClient client = new LoaderClient(topicName, configPath);
-        final Function0 function = new Function0(fiberNum);
-
-        long start = System.currentTimeMillis();
-        long count = 0L;
-        while (iterator.hasNext())
+        final BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<>(10000);
+        int scale = sf / 10;
+        for (int i = 0; i < 10; i++)
         {
-            Lineorder lineorder = iterator.next();
-            Message message = new Message(function.apply(lineorder.getCustomerKey()), lineorder.toLine());
-            message.setTimestamp(lineorder.getMessageDate());
-            client.sendMessage(message);
-            count++;
+            Generator generator = new Generator(scale, fiberNum, blockingQueue);
+            generator.run();
         }
-        long end = System.currentTimeMillis();
-        System.out.println("Generated and sent num of messages: " + count + ", time cost: " + (end - start) + "ms");
+        for (int i = 0; i < 1; i++)
+        {
+            Producer producer = new Producer(topicName, configPath, blockingQueue);
+            producer.run();
+        }
     }
 
     private static ArgumentParser argParser()
@@ -218,18 +219,114 @@ public class BenchmarkProducer
                 .action(store())
                 .type(String.class)
                 .choices("W", "R", "WR", "D")
-                .metavar("ACTION")
-                .dest("action")
-                .help("Action: W or R");
+                .metavar("MODE")
+                .dest("mode")
+                .help("Mode: W(Generate data and write to disk), R(Read from disk and send to Kafka), WR(W and R), D(Generate data and send to Kafka directly without spilling to disk)");
 
-        parser.addArgument("--config-file")
+        parser.addArgument("--config-path")
                 .required(true)
                 .action(store())
                 .type(String.class)
                 .metavar("CONFIG-FILE")
-                .dest("configFile")
+                .dest("configPath")
                 .help("Path of config file");
 
         return parser;
+    }
+
+    private class Generator implements Runnable
+    {
+        private final int scaleFactor;
+        private final BlockingQueue<Message> blockingQueue;
+        private final Function0 function;
+
+        Generator(int scaleFactor, int fiberNum, BlockingQueue<Message> blockingQueue)
+        {
+            this.scaleFactor = scaleFactor;
+            this.blockingQueue = blockingQueue;
+            function = new Function0(fiberNum);
+        }
+
+        /**
+         * When an object implementing interface <code>Runnable</code> is used
+         * to create a thread, starting the thread causes the object's
+         * <code>run</code> method to be called in that separately executing
+         * thread.
+         * <p>
+         * The general contract of the method <code>run</code> is that it may
+         * take any action whatsoever.
+         *
+         * @see Thread#run()
+         */
+        @Override
+        public void run()
+        {
+            long start = System.currentTimeMillis();
+            long count = 0L;
+            final Iterator<Lineorder> iterator = new LineorderGenerator(scaleFactor, 10, 100).iterator();
+            while (iterator.hasNext())
+            {
+                Lineorder lineorder = iterator.next();
+                Message message = new Message(function.apply(lineorder.getCustomerKey()), lineorder.toLine());
+                message.setTimestamp(lineorder.getMessageDate());
+                try
+                {
+                    blockingQueue.put(message);
+                    count++;
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("Generator num: " + count + ", cost: " + (end - start) + "ms");
+        }
+    }
+
+    private class Producer implements Runnable
+    {
+        private final String topicName;
+        private final String configPath;
+        private final BlockingQueue<Message> blockingQueue;
+
+        public Producer(String topicName, String configPath, BlockingQueue<Message> blockingQueue)
+        {
+            this.topicName = topicName;
+            this.configPath = configPath;
+            this.blockingQueue = blockingQueue;
+        }
+
+        /**
+         * When an object implementing interface <code>Runnable</code> is used
+         * to create a thread, starting the thread causes the object's
+         * <code>run</code> method to be called in that separately executing
+         * thread.
+         * <p>
+         * The general contract of the method <code>run</code> is that it may
+         * take any action whatsoever.
+         *
+         * @see Thread#run()
+         */
+        @Override
+        public void run()
+        {
+            final LoaderClient client = new LoaderClient(topicName, configPath);
+            long count = 0L;
+            Message message = null;
+            long start = System.currentTimeMillis();
+            try
+            {
+                while ((message = blockingQueue.poll(100, TimeUnit.SECONDS)) != null)
+                {
+                    client.sendMessage(message);
+                    count++;
+                }
+                long end = System.currentTimeMillis();
+                System.out.println("Sent num: " + count + ", cost: " + (end - start) + "ms");
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 }

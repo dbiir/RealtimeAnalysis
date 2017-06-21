@@ -5,11 +5,30 @@ Four modules are included:
 + LoaderClient: Push messages to Kafka.
 + RealTimeBenchmark: Generate TPC-H(`order` and `lineitem`) based dataset and call LoaderClient to push messages.
 
-### Get started
+### Prerequisites
+1. Kafka 0.9.0.x
+2. Zookeeper 3.4.x
+3. Hadoop 2.6.x
+4. PostgreSQL 9.4+
+
+### Deployment
 1. `mvn package -DskipTests`.
 2. Generated jar files are located in `dist/bin` directory.
 3. Run `java -jar xxx.jar` for help.
 4. Modify `nodes` file, add hostnames or ip addresses. Run `sbin/deploy.sh` to deploy toolkits to nodes specified in `nodes`.
+
+### Getting Started
+1. Config and start Hadoop, Zookeeper, Kafka and PostgreSQL.
+2. Create a topic in Kafka cluster.
+3. Create meta database in PostgreSQL.
+2. Config and start `Loader`s in each node.
+3. Config and start `RealTimeBenchmark` or `LoaderClient`.
+
+### Benchmark
+`java -jar bin/RealtimeBenchmark-1.0-SNAPSHOT-allinone.jar --topic test --scale-factor 100 --fiber-num 80 --file-path ./test --mode RW --config-file ./conf/config.props`
+
+### Loader
+`java -jar bin/Loader-1.0-SNAPSHOT-allinone.jar cong/config.props`
 
 ### Configuration
 
