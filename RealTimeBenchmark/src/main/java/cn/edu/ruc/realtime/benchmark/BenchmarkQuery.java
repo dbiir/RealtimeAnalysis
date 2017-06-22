@@ -117,7 +117,7 @@ public class BenchmarkQuery
                 {
                     Statement stmt = conn.createStatement();
                     String sql = String.format(
-                            "SELECT SUM(quantity) AS sum_qty , AVG(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey FROM realtime100 WHERE messagedate>timestamp '%s' and messagedate<timestamp '%s';",
+                            "SELECT SUM(quantity) AS sum_qty , AVG(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey FROM realtime100 WHERE messagedate>timestamp '%s' and messagedate<timestamp '%s'",
                             timePoints[i],
                             TIMESTAMP_MAX
                     );
@@ -205,7 +205,7 @@ public class BenchmarkQuery
                     int rnd = ThreadLocalRandom.current().nextInt(custKeyBaseArr.length);
                     custK = custKeyBaseArr[rnd];
                     String sql = String.format(
-                            "SELECT SUM(quantity) AS sum_qty , AVG(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey FROM realtime100 WHERE custkey='%s';",
+                            "SELECT SUM(quantity) AS sum_qty , AVG(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey FROM realtime100 WHERE custkey=%s",
                             custK
                     );
                     long resultCount = 0L;
@@ -301,7 +301,7 @@ public class BenchmarkQuery
                     int rnd = ThreadLocalRandom.current().nextInt(baseCustKeyArr.length);
                     custK = baseCustKeyArr[rnd];
                     String sql = String.format(
-                            "SELECT SUM(quantity) AS sum_qty , AVG(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey FROM realtime100 WHERE messagedate>timestamp '%s' and messagedate<timestamp '%s' and custkey=%s;",
+                            "SELECT SUM(quantity) AS sum_qty , AVG(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey FROM realtime100 WHERE messagedate>timestamp '%s' and messagedate<timestamp '%s' and custkey=%s",
                             timePoints[i],
                             TIMESTAMP_MAX,
                             custK
