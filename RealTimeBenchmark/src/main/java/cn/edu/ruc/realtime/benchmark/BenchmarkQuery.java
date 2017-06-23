@@ -39,7 +39,7 @@ public class BenchmarkQuery
     {
         if (args.length < 4)
         {
-            System.out.println("ARGS: <repetitionTimes> <sleepSeconds> <queryMode> <statisticFilePath> [dataFilePath]");
+            System.out.println("ARGS: <repetitionTimes> <sleepSeconds> <queryMode> <statisticFilePath> [dataFilePath or timePointsPath,custKeysPath]");
             System.exit(-1);
         }
         int times = Integer.parseInt(args[0]);
@@ -85,6 +85,13 @@ public class BenchmarkQuery
             benchmarkQuery.testTimestamp(times, sleepSecs, statPath);
             benchmarkQuery.testCustkey(times, sleepSecs, statPath, dataFilePath);
             benchmarkQuery.testTimestampAndCustkey(times, sleepSecs, statPath, dataFilePath);
+        }
+        if (mode == 8)  // JOIN
+        {
+            String[] parts = dataFilePath.split(",");
+            String timePointsPath = parts[0].trim();
+            String custKeysPath = parts[1].trim();
+            benchmarkQuery.testJoin(times, sleepSecs, statPath, timePointsPath, custKeysPath);
         }
     }
 
@@ -368,6 +375,139 @@ public class BenchmarkQuery
         writeOut(times, statPath, statistics);
     }
 
+    private void testJoin(int times, int sleepSecs, String statPath, String timePointsPath, String custKeysPath)
+    {
+        List<String> statistics = new ArrayList<>(times * 2);
+
+        Connection conn = null;
+        try (BufferedReader timePointsReader = new BufferedReader(new FileReader(timePointsPath));
+             BufferedReader custKeysReader = new BufferedReader(new FileReader(custKeysPath)))
+        {
+            Properties properties = new Properties();
+            properties.put("user", "presto");
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, properties);
+            String line = null;
+            int index = 0;
+
+            // custKey join
+            while ((line = custKeysReader.readLine()) != null && index < times)
+            {
+                try
+                {
+                    Statement stmt = conn.createStatement();
+                    String sql = String.format(
+                            "SELECT quantity , extendedprice, discount, orderkey, ordercomment, name, nationkey, phone FROM realtime100, customer WHERE custkey=%s and customerkey=custkey",
+                            line);
+                    long resultCount = 0L;
+                    long start = System.currentTimeMillis();
+                    ResultSet resultSet = stmt.executeQuery(sql);
+                    while (resultSet.next())
+                    {
+                        resultCount++;
+                    }
+                    long end = System.currentTimeMillis();
+                    index++;
+                    resultSet.close();
+                    stmt.close();
+                    // queryId, timeCost, resultCount, customerKey, executionState
+                    String stat = String.format(
+                            "QUERY-CUSTKEY-JOIN%d, %d, %d, %s, %s",
+                            index,
+                            (end - start),
+                            resultCount,
+                            line,
+                            "OK");
+                    statistics.add(stat);
+                    System.out.println("QUERY" + index + ": " + sql);
+                    Thread.sleep(sleepSecs * 100);
+                }
+                catch (Exception e)
+                {
+                    String stat = String.format(
+                            "QUERY-CUSTKEY-JOIN%d, %d, %d, %s, %s",
+                            index,
+                            0,
+                            0,
+                            line,
+                            e.getMessage());
+                    e.printStackTrace();
+                    statistics.add(stat);
+                }
+            }
+            System.out.println("Done with custkey join. Current timestamp: " + new Timestamp(System.currentTimeMillis()));
+
+            index = 0;
+            // time point join
+            while ((line = timePointsReader.readLine()) != null && index < times)
+            {
+                try
+                {
+                    Statement stmt = conn.createStatement();
+                    String sql = String.format(
+                            "SELECT count(*) AS num FROM realtime100, customer WHERE messagedate>timestamp '%s' and messagedate<timestamp '%s' and customerkey=custkey",
+                            line,
+                            TIMESTAMP_MAX);
+                    long start = System.currentTimeMillis();
+                    long resultCount = 0L;
+                    long end = 0L;
+                    ResultSet resultSet = stmt.executeQuery(sql);
+                    if (resultSet.next())
+                    {
+                        resultCount = resultSet.getLong("num");
+                        end = System.currentTimeMillis();
+                    }
+                    index++;
+                    resultSet.close();
+                    stmt.close();
+                    // queryId, timeCost, resultCount, timePoint, executionState
+                    String stat = String.format(
+                            "QUERY-TIMEPOINT-JOIN%d, %d, %d, %s, %s",
+                            index,
+                            (end - start),
+                            resultCount,
+                            line,
+                            "OK");
+                    statistics.add(stat);
+                    System.out.println("QUERY" + index + ": " + sql);
+                    Thread.sleep(sleepSecs * 100);
+                }
+                catch (Exception e)
+                {
+                    String stat = String.format(
+                            "QUERY-TIMEPOINT-JOIN%d, %d, %d, %s, %s",
+                            index,
+                            0,
+                            0,
+                            line,
+                            e.getMessage());
+                    e.printStackTrace();
+                    statistics.add(stat);
+                }
+            }
+            System.out.println("Done with time point join. Current timestamp: " + new Timestamp(System.currentTimeMillis()));
+        }
+        catch (ClassNotFoundException | SQLException | IOException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (conn != null)
+            {
+                try
+                {
+                    conn.close();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // write out statistics
+        writeOut(times, statPath, statistics);
+    }
+
     private void writeOut(int times, String statPath, List<String> statistics)
     {
         try
@@ -375,9 +515,9 @@ public class BenchmarkQuery
             System.out.println("Done with queries. Write out statistics");
             BufferedWriter writer = new BufferedWriter(new FileWriter(statPath, true));
             writer.write("Done with benching. Current timestamp: " + new Timestamp(System.currentTimeMillis()));
-            for (int i = 0; i < times; i++)
+            for (String stat : statistics)
             {
-                writer.write(statistics.get(i));
+                writer.write(stat);
                 writer.newLine();
             }
             writer.flush();

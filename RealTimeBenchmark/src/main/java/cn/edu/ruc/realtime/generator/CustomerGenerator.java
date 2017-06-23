@@ -91,7 +91,7 @@ public class CustomerGenerator
                 ResultSet resultSet = stmt.executeQuery(sql);
                 while (resultSet.next())
                 {
-                    long custKey = resultSet.getLong(0);
+                    long custKey = resultSet.getLong("custkey");
                     Customer customer = computeNext(custKey);
                     writer.write(customer.toLine());
                     writer.newLine();

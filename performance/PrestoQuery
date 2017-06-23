@@ -1,10 +1,21 @@
 create table realtime100(custkey bigint, orderkey bigint, partkey bigint, suppkey bigint, linenumber integer, quantity double, extendedprice double, discount double, tax double, returnflag varchar(1), linestatus varchar(1), shipdate date, commitdate date, receiptdate date, shipinstruct varchar(25), shipmode varchar(10), comment varchar(44), orderstatus varchar(1), totalprice double, orderdate date, orderpriority varchar(15), clerk varchar(15), shippriority integer, ordercomment varchar(79), messagedate timestamp) fiber partition by (custkey) using function function0 timestamp by (messagedate);
 
+create table customer(customerkey bigint, name varchar(32), address varchar(40), nationkey bigint, phone varchar(15), accountbalance double, marketsegment varchar(10), comment varchar(117));
+
 create table realtimetest(custkey integer, orderkey integer, partkey integer, suppkey integer, linenumber integer, quantity double, extendedprice double, discount double, tax double, returnflag varchar(1), linestatus varchar(1), shipdate varchar(20), commitdate varchar(20), receiptdate varchar(20), shipinstruct varchar(25), shipmode varchar(10), comment varchar(44), orderstatus varchar(20), totalprice double, orderdate varchar(20), orderpriority varchar(100), clerk varchar(100), shippriority integer, ordercomment varchar(500), messagedate timestamp) fiber partition by (custkey) using function function0 timestamp by (messagedate);
+
+
+SELECT quantity , extendedprice, discount, orderkey, ordercomment, name, nationkey, phone FROM realtime100, customer WHERE custkey=245728475 and customerkey=custkey;
+
+SELECT quantity , extendedprice, discount, orderkey, ordercomment, name, nationkey, phone FROM realtime100, customer WHERE messagedate>timestamp '2017-06-21 14:47:26.030' and messagedate<timestamp '2017-06-21 15:07:31.424' and customerkey=custkey
+
+SELECT count(*) FROM realtime100, customer WHERE messagedate>timestamp '2017-06-21 14:47:26.030' and messagedate<timestamp '2017-06-21 15:07:31.424' and customerkey=custkey;
 
 SELECT sum(quantity) AS sum_qty, sum(extendedprice) AS sum_base_price, avg(quantity) AS avg_qty, avg(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime where messagedate<timestamp '2017-06-01 20:12:05' and messagedate>timestamp '2017-06-01 20:11:45'
 
 SELECT sum(quantity) AS sum_qty, sum(extendedprice) AS sum_base_price, avg(quantity) AS avg_qty, avg(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from realtime where custkey = c AND messagedate > s1 and messagedate < s2
+
+SELECT SUM(quantity) AS sum_qty , AVG(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey, name, address, nationkey, customerkey FROM realtime100, customer WHERE messagedate>timestamp '2017-06-21 14:47:26.030' and messagedate<timestamp '2017-06-21 15:07:31.424' AND custkey=customerkey
 
 SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquet1;
 SELECT avg(suppkey) AS avg_order, sum(linenumber) AS sum_line, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey from lineparquet2;

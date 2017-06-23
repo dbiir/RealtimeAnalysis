@@ -31,7 +31,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>CustomerGenerator</finalName>
+                            <finalName>BenchmarkQuery</finalName>
                             <outputDirectory>${project.parent.basedir}/dist/bin</outputDirectory>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>allinone</shadedClassifierName>
@@ -47,7 +47,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>cn.edu.ruc.realtime.generator.CustomerGenerator</mainClass>
+                                    <mainClass>cn.edu.ruc.realtime.benchmark.BenchmarkQuery</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
