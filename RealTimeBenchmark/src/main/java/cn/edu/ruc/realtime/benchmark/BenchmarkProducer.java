@@ -124,6 +124,7 @@ public class BenchmarkProducer
         String line = null;
         long readStart = System.currentTimeMillis();
         long readCount = 0;
+        System.out.println("Starting time: " + System.currentTimeMillis());
         while ((line = reader.readLine()) != null)
         {
             String[] lineParts = line.split("\\|");

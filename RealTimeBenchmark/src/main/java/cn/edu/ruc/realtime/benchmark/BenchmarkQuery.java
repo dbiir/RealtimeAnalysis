@@ -42,7 +42,7 @@ public class BenchmarkQuery
             System.out.println("ARGS: <repetitionTimes> <sleepSeconds> <queryMode> <statisticFilePath> [dataFilePath or timePointsPath,custKeysPath]");
             System.exit(-1);
         }
-        int times = Integer.parseInt(args[0]);
+        long times = Long.parseLong(args[0]);
         int sleepSecs = Integer.parseInt(args[1]);
         int mode = Integer.parseInt(args[2]);
         String statPath = args[3];
@@ -55,43 +55,122 @@ public class BenchmarkQuery
         BenchmarkQuery benchmarkQuery = new BenchmarkQuery();
         if (mode == 1)
         {
-            benchmarkQuery.testTimestamp(times, sleepSecs, statPath);
+            benchmarkQuery.testTimestamp((int) times, sleepSecs, statPath);
         }
         if (mode == 2)
         {
-            benchmarkQuery.testCustkey(times, sleepSecs, statPath, dataFilePath);
+            benchmarkQuery.testCustkey((int) times, sleepSecs, statPath, dataFilePath);
         }
         if (mode == 4)
         {
-            benchmarkQuery.testTimestampAndCustkey(times, sleepSecs, statPath, dataFilePath);
+            benchmarkQuery.testTimestampAndCustkey((int) times, sleepSecs, statPath, dataFilePath);
         }
         if (mode == 3) // 1 + 2
         {
-            benchmarkQuery.testTimestamp(times, sleepSecs, statPath);
-            benchmarkQuery.testCustkey(times, sleepSecs, statPath, dataFilePath);
+            benchmarkQuery.testTimestamp((int) times, sleepSecs, statPath);
+            benchmarkQuery.testCustkey((int) times, sleepSecs, statPath, dataFilePath);
         }
         if (mode == 5) // 1 + 4
         {
-            benchmarkQuery.testTimestamp(times, sleepSecs, statPath);
-            benchmarkQuery.testTimestampAndCustkey(times, sleepSecs, statPath, dataFilePath);
+            benchmarkQuery.testTimestamp((int) times, sleepSecs, statPath);
+            benchmarkQuery.testTimestampAndCustkey((int) times, sleepSecs, statPath, dataFilePath);
         }
         if (mode == 6) // 2 + 4
         {
-            benchmarkQuery.testCustkey(times, sleepSecs, statPath, dataFilePath);
-            benchmarkQuery.testTimestampAndCustkey(times, sleepSecs, statPath, dataFilePath);
+            benchmarkQuery.testCustkey((int) times, sleepSecs, statPath, dataFilePath);
+            benchmarkQuery.testTimestampAndCustkey((int) times, sleepSecs, statPath, dataFilePath);
         }
         if (mode == 7) // 1 + 2 + 4
         {
-            benchmarkQuery.testTimestamp(times, sleepSecs, statPath);
-            benchmarkQuery.testCustkey(times, sleepSecs, statPath, dataFilePath);
-            benchmarkQuery.testTimestampAndCustkey(times, sleepSecs, statPath, dataFilePath);
+            benchmarkQuery.testTimestamp((int) times, sleepSecs, statPath);
+            benchmarkQuery.testCustkey((int) times, sleepSecs, statPath, dataFilePath);
+            benchmarkQuery.testTimestampAndCustkey((int) times, sleepSecs, statPath, dataFilePath);
         }
         if (mode == 8)  // JOIN
         {
             String[] parts = dataFilePath.split(",");
             String timePointsPath = parts[0].trim();
             String custKeysPath = parts[1].trim();
-            benchmarkQuery.testJoin(times, sleepSecs, statPath, timePointsPath, custKeysPath);
+            benchmarkQuery.testJoin((int) times, sleepSecs, statPath, timePointsPath, custKeysPath);
+        }
+        if (mode == 9)  // QUERY WHILE LOADING
+        {
+            benchmarkQuery.testWhileLoading(times, sleepSecs, statPath);
+        }
+    }
+
+    private void testWhileLoading(long startTime, int sleepSecs, String statPath)
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Connection conn = null;
+
+        try(BufferedWriter statWriter = new BufferedWriter(new FileWriter(statPath, true));)
+        {
+            Properties properties = new Properties();
+            properties.put("user", "presto");
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, properties);
+
+            long index = 0L;
+
+            while (true)
+            {
+                long curMaxTimestamp = System.currentTimeMillis();
+                long rndT = ThreadLocalRandom.current().nextLong(startTime, curMaxTimestamp);
+                Date date = new Date(rndT);
+                String dateStr = sdf.format(date);
+                String maxStr = sdf.format(new Date(curMaxTimestamp));
+
+                Statement stmt = conn.createStatement();
+                String sql = String.format(
+                        "SELECT SUM(quantity) AS sum_qty , AVG(extendedprice) AS avg_price, avg(discount) AS avg_disc, count(*) AS count_order, min(orderkey) AS min_orderkey, max(orderkey) AS max_orderkey FROM realtime100 WHERE messagedate>timestamp '%s' and messagedate<timestamp '%s'",
+                        dateStr,
+                        maxStr
+                );
+                long resultCount = 0L;
+                long start = System.currentTimeMillis();
+                long end = 0L;
+                ResultSet resultSet = stmt.executeQuery(sql);
+                if (resultSet.next())
+                {
+                    end = System.currentTimeMillis();
+                    resultCount = resultSet.getLong("count_order");
+                }
+                resultSet.close();
+                stmt.close();
+                // queryId, timeCost, resultCount, timePoint, timeRange, executionState
+                String stat = String.format(
+                        "QUERY%d, %d, %d, %s, %s",
+                        index,
+                        (end - start),
+                        resultCount,
+                        sql,
+                        "OK");
+                statWriter.write(stat);
+                statWriter.newLine();
+                statWriter.flush();
+
+                index++;
+
+                Thread.sleep(sleepSecs);
+            }
+        }
+        catch (ClassNotFoundException | SQLException | IOException | InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (conn != null)
+            {
+                try
+                {
+                    conn.close();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

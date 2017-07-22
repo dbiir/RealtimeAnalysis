@@ -35,4 +35,11 @@ public class CommonTest
             System.out.println("Key: " + v + ", count: " + stats.get(v));
         }
     }
+
+    @Test
+    public void stringJoinTest()
+    {
+        String[] strA = {"this", "is", "an", "array"};
+        System.out.println(String.join("|", strA));
+    }
 }
