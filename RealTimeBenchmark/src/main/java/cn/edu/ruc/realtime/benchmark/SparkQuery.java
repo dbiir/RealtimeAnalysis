@@ -36,7 +36,7 @@ public class SparkQuery
         {
             queries.add(line.trim());
         }
-
+        reader.close();
         SparkSession spark = SparkSession.builder()
                 .appName("SparkQuery")
                 .getOrCreate();
